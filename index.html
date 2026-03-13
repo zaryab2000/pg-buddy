@@ -1,0 +1,1358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>PG Buddy — Sufia's NEET PG Companion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FFF8F0;
+    --card: #FFFFFF;
+    --pri: #E8A0BF;
+    --pri-dark: #C77DA3;
+    --pri-soft: #FFF0F5;
+    --sec: #C9B1FF;
+    --sec-soft: #F0E6FF;
+    --accent: #FFB366;
+    --accent-soft: #FFF3E0;
+    --mint: #A8E6CF;
+    --text: #4A3728;
+    --text-l: #8B7355;
+    --text-m: #B5A08E;
+    --shadow: 0 2px 16px rgba(74,55,40,0.07);
+    --shadow-h: 0 4px 24px rgba(74,55,40,0.12);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    -webkit-tap-highlight-color: transparent;
+    min-height: 100vh;
+  }
+  ::-webkit-scrollbar { width: 3px; }
+  ::-webkit-scrollbar-thumb { background: var(--pri); border-radius: 4px; }
+  input:focus { outline: none; }
+  button { -webkit-tap-highlight-color: transparent; }
+
+  @keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes float { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-5px); } }
+  @keyframes pulse { 0%,100% { transform:scale(1); } 50% { transform:scale(1.06); } }
+  @keyframes spin { from { transform:rotate(0); } to { transform:rotate(360deg); } }
+  @keyframes bkFlash { 0% { box-shadow: 0 0 0 0 rgba(255,179,102,.5); } 100% { box-shadow: 0 0 0 12px rgba(255,179,102,0); } }
+  @keyframes revealPop { from { transform:scale(.9); opacity:0; } to { transform:scale(1); opacity:1; } }
+  @keyframes spinBtnPulse { 0%,100% { box-shadow: 0 4px 20px rgba(232,160,191,.4); } 50% { box-shadow: 0 4px 30px rgba(201,177,255,.6); } }
+
+  .fu { animation: fadeUp .4s ease-out both; }
+  .fl { animation: float 3s ease-in-out infinite; }
+
+  #app { max-width: 480px; margin: 0 auto; min-height: 100vh; padding-bottom: 76px; position: relative; }
+
+  /* Loading Screen */
+  #loading {
+    position: fixed; inset: 0; z-index: 999;
+    background: var(--bg);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+  }
+  #loading .spinner { width:40px; height:40px; border:3px solid rgba(232,160,191,.3); border-top-color:var(--pri); border-radius:50%; animation:spin .8s linear infinite; }
+
+  /* Bottom Nav */
+  #bottom-nav {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 480px;
+    background: #fff; border-top: 1px solid #f0e4f4;
+    display: flex; padding: 5px 6px 8px; z-index: 50;
+    box-shadow: 0 -4px 16px rgba(74,55,40,.05);
+  }
+  .nav-btn {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 1px;
+    background: none; border: none; cursor: pointer; padding: 5px 2px;
+    font-family: 'Nunito', sans-serif;
+  }
+  .nav-btn .nav-icon { font-size: 19px; transition: all .2s; }
+  .nav-btn .nav-label { font-size: 9px; font-weight: 600; color: var(--text-m); transition: all .2s; }
+  .nav-btn .nav-dot { width:14px; height:2.5px; border-radius:2px; background:linear-gradient(90deg,var(--pri),var(--sec)); margin-top:1px; display:none; }
+  .nav-btn.active .nav-icon { transform: scale(1.12); }
+  .nav-btn.active .nav-label { font-weight: 800; color: var(--pri-dark); }
+  .nav-btn.active .nav-dot { display: block; }
+
+  /* Tabs */
+  .tab { display: none; }
+  .tab.active { display: block; }
+
+  /* Cards */
+  .card {
+    background: var(--card); border-radius: 16px; box-shadow: var(--shadow);
+  }
+  .card-hover { cursor: pointer; transition: all .2s; }
+  .card-hover:hover { box-shadow: var(--shadow-h); transform: translateY(-2px); }
+
+  /* Buttons */
+  .btn-primary {
+    background: linear-gradient(135deg, var(--pri), var(--sec));
+    color: #fff; border: none; border-radius: 24px; padding: 10px 22px;
+    font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'Nunito', sans-serif;
+    transition: all .2s;
+  }
+  .btn-primary:disabled { opacity: .6; cursor: not-allowed; }
+  .btn-secondary {
+    background: #fff; color: var(--text); border: 1.5px solid #e8ddd4;
+    border-radius: 24px; padding: 10px 22px; font-size: 14px; font-weight: 700;
+    cursor: pointer; font-family: 'Nunito', sans-serif; transition: all .2s;
+  }
+
+  /* Pill */
+  .pill {
+    padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700;
+    white-space: nowrap; border: 1.5px solid #e8ddd4; cursor: pointer;
+    font-family: 'Nunito', sans-serif; background: #fff; color: var(--text-l); transition: all .2s;
+  }
+  .pill.active {
+    background: linear-gradient(135deg, var(--pri), var(--sec));
+    color: #fff; border: none;
+  }
+
+  /* HOME tab */
+  #tab-home { padding: 20px 16px; }
+  .home-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+  .streak-badge {
+    background: linear-gradient(135deg,#FFF3E0,#FFE0B2);
+    border-radius: 14px; padding: 8px 12px; text-align: center;
+  }
+  .countdown-card { background:linear-gradient(135deg,#FFF0F5,#F0E6FF,#FFF3E0); padding: 20px; margin-bottom: 14px; }
+  .countdown-grid { display: flex; gap: 8px; }
+  .countdown-unit { flex:1; background:#fff; border-radius:12px; padding:10px 4px; text-align:center; }
+  .countdown-val { font-size:22px; font-weight:800; font-family:'Playfair Display',serif; }
+  .countdown-lbl { font-size:9px; color:var(--text-m); font-weight:700; margin-top:1px; }
+  .quick-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .quick-card { padding: 14px; border-radius: 16px; }
+
+  /* STUDY AI tab */
+  #tab-study { display: flex; flex-direction: column; height: calc(100vh - 76px); }
+  #tab-study.active { display: flex; }
+  .study-header {
+    padding: 12px 16px 10px;
+    background: linear-gradient(135deg,#FFF0F5,#F0E6FF);
+    border-bottom: 1px solid #f0e4f4;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-shrink: 0;
+  }
+  .chat-messages { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+  .chat-input-bar {
+    padding: 10px 14px; border-top: 1px solid #f0e4f4;
+    background: #fff; display: flex; gap: 8px; flex-shrink: 0;
+  }
+  .chat-input-bar input {
+    flex: 1; padding: 10px 14px; border-radius: 22px; border: 2px solid #f0e4f4;
+    font-size: 14px; font-family: 'Nunito', sans-serif; background: var(--bg); transition: border-color .2s;
+  }
+  .chat-input-bar input:focus { border-color: var(--pri); }
+  .msg-bubble { max-width: 85%; padding: 10px 14px; font-size: 13px; line-height: 1.6; box-shadow: var(--shadow); white-space: pre-wrap; }
+  .msg-user { border-radius: 16px 16px 4px 16px; background: linear-gradient(135deg,var(--pri),var(--sec)); color: #fff; align-self: flex-end; }
+  .msg-ai { border-radius: 16px 16px 16px 4px; background: #fff; color: var(--text); }
+  .typing-dots { display: flex; gap: 5px; padding: 10px 14px; background: #fff; border-radius: 14px; width: fit-content; box-shadow: var(--shadow); }
+  .typing-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--pri); }
+  .bookmarks-panel { padding: 12px; background: #FFFDF5; border-bottom: 1px solid #f0e4f4; max-height: 220px; overflow-y: auto; flex-shrink: 0; }
+  .quick-prompts { padding: 16px; overflow-y: auto; flex-shrink: 0; }
+  .prompt-chip { padding: 10px 12px; background: #fff; border-radius: 10px; font-size: 13px; cursor: pointer; box-shadow: var(--shadow); margin-bottom: 8px; border: 1px solid #f5e6f0; }
+
+  /* PLANNER tab */
+  #tab-planner { padding: 20px 16px; }
+  .subject-card { padding: 12px 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+  .filter-row { display: flex; gap: 6px; margin-bottom: 14px; overflow-x: auto; padding-bottom: 4px; }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: center; padding: 16px;
+  }
+  .modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,.3); backdrop-filter: blur(4px); }
+  .modal-content {
+    background: #fff; border-radius: 20px; padding: 22px;
+    max-width: 400px; width: 100%; position: relative;
+    max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,.15);
+    z-index: 1;
+  }
+  .modal-close { position: absolute; top: 12px; right: 14px; background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-m); }
+  .topic-tag { padding: 3px 9px; border-radius: 7px; font-size: 11px; font-weight: 600; display: inline-block; margin: 2px; }
+
+  /* MOTIVATE tab */
+  #tab-motivate { padding: 20px 16px; display: flex; flex-direction: column; min-height: calc(100vh - 76px); }
+  #tab-motivate.active { display: flex; }
+  .wheel-wrapper { position: relative; width: 260px; height: 260px; margin: 0 auto 24px; }
+  .wheel-pointer { position: absolute; top: -8px; left: 50%; transform: translateX(-50%); z-index: 2; font-size: 28px; color: var(--pri-dark); filter: drop-shadow(0 2px 4px rgba(0,0,0,.2)); }
+  #wheel-svg { filter: drop-shadow(0 4px 12px rgba(0,0,0,.1)); }
+  .spin-btn {
+    background: linear-gradient(135deg,var(--pri),var(--sec),var(--accent));
+    color: #fff; border: none; border-radius: 30px; padding: 14px 48px;
+    font-size: 18px; font-weight: 900; cursor: pointer; font-family: 'Nunito', sans-serif;
+    letter-spacing: 1px; text-transform: uppercase;
+    animation: spinBtnPulse 2s ease-in-out infinite;
+    transition: all .3s; margin-bottom: 20px;
+  }
+  .spin-btn:disabled { background: linear-gradient(135deg,#ccc,#ddd); cursor: not-allowed; animation: none; }
+  .spin-quote-card {
+    background: linear-gradient(135deg,#FFF0F5,#F0E6FF);
+    border-radius: 16px; padding: 18px; text-align: center; width: 100%; max-width: 360px;
+    animation: revealPop .4s ease-out both;
+  }
+
+  /* RESOURCES tab */
+  #tab-resources { padding: 20px 16px; }
+  .resource-card { padding: 12px 14px; display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; display: block; margin-bottom: 8px; }
+
+  /* Journey staircase */
+  .journey-card { padding: 18px 16px; margin-bottom: 14px; background: linear-gradient(135deg,#FCE4EC,#F3E5F5,#E8EAF6); }
+  .staircase { display: flex; align-items: flex-end; justify-content: center; gap: 0; height: 140px; padding: 0 8px; }
+  .stair-step { display: flex; flex-direction: column; align-items: center; flex: 1; }
+  .stair-block { width: 100%; border-radius: 10px 10px 0 0; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+</style>
+</head>
+<body>
+
+<div id="loading">
+  <div class="fl" style="font-size:48px">🩺</div>
+  <p style="font-family:'Playfair Display',serif;font-size:20px;color:var(--text)">Loading PG Buddy...</p>
+  <div class="spinner"></div>
+</div>
+
+<div id="app" style="display:none">
+
+  <!-- HOME -->
+  <div id="tab-home" class="tab fu">
+    <div class="home-header">
+      <div>
+        <p id="greeting-text" style="font-size:13px;color:var(--text-l)"></p>
+        <h1 style="font-family:'Playfair Display',serif;font-size:26px;color:var(--text)">Dr. Sufia ✨</h1>
+        <p style="font-size:12px;color:var(--text-m);margin-top:2px">NEET PG 2026 Aspirant</p>
+      </div>
+      <div id="streak-badge" class="streak-badge" style="display:none">
+        <div style="font-size:20px">🔥</div>
+        <div id="streak-num" style="font-size:16px;font-weight:900;color:#E65100"></div>
+        <div style="font-size:9px;color:#BF360C;font-weight:700">day streak</div>
+      </div>
+    </div>
+
+    <!-- Countdown -->
+    <div class="card countdown-card" style="margin-bottom:14px">
+      <p style="font-size:11px;font-weight:700;color:var(--pri-dark);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">⏰ Countdown to NEET PG</p>
+      <div class="countdown-grid">
+        <div class="countdown-unit"><div id="cd-days" class="countdown-val">00</div><div class="countdown-lbl">Days</div></div>
+        <div class="countdown-unit"><div id="cd-hours" class="countdown-val">00</div><div class="countdown-lbl">Hours</div></div>
+        <div class="countdown-unit"><div id="cd-mins" class="countdown-val">00</div><div class="countdown-lbl">Mins</div></div>
+        <div class="countdown-unit"><div id="cd-secs" class="countdown-val">00</div><div class="countdown-lbl">Secs</div></div>
+      </div>
+      <p style="font-size:11px;color:var(--text-l);text-align:center;margin-top:10px">📅 Expected: August 11, 2026</p>
+    </div>
+
+    <!-- Journey Staircase -->
+    <div class="card journey-card">
+      <p style="font-size:10px;font-weight:700;color:var(--pri-dark);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;text-align:center">🏆 Your Journey</p>
+      <div class="staircase">
+        <div class="stair-step">
+          <div class="fl" style="font-size:24px;margin-bottom:6px;animation-delay:0s">🎓</div>
+          <div class="stair-block" style="height:35px;background:linear-gradient(180deg,#E8A0BF,#E8A0BFdd)">
+            <span style="font-size:11px;font-weight:800;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.2)">MBBS</span>
+            <span style="font-size:8px;font-weight:600;color:rgba(255,255,255,.85);margin-top:1px">Ukraine</span>
+          </div>
+        </div>
+        <div class="stair-step">
+          <div class="fl" style="font-size:24px;margin-bottom:6px;animation-delay:.2s">✅</div>
+          <div class="stair-block" style="height:60px;background:linear-gradient(180deg,#C9B1FF,#C9B1FFdd)">
+            <span style="font-size:11px;font-weight:800;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.2)">FMGE</span>
+            <span style="font-size:8px;font-weight:600;color:rgba(255,255,255,.85);margin-top:1px">1st Attempt</span>
+          </div>
+        </div>
+        <div class="stair-step">
+          <div class="fl" style="font-size:24px;margin-bottom:6px;animation-delay:.4s">🏥</div>
+          <div class="stair-block" style="height:85px;background:linear-gradient(180deg,#FFB366,#FFB366dd)">
+            <span style="font-size:11px;font-weight:800;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.2)">Internship</span>
+            <span style="font-size:8px;font-weight:600;color:rgba(255,255,255,.85);margin-top:1px">Completed</span>
+          </div>
+        </div>
+        <div class="stair-step">
+          <div class="fl" style="font-size:24px;margin-bottom:6px;animation-delay:.6s">🎯</div>
+          <div class="stair-block" style="height:115px;background:linear-gradient(180deg,#A8E6CF,#A8E6CFdd);box-shadow:0 0 16px rgba(168,230,207,.4);border:2px dashed #66BB6A">
+            <span style="font-size:11px;font-weight:800;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.2)">NEET PG</span>
+            <span style="font-size:8px;font-weight:600;color:rgba(255,255,255,.85);margin-top:1px">Next →</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Daily Quote -->
+    <div id="daily-quote-card" class="card" style="padding:14px;margin-bottom:14px;border-left:4px solid var(--pri);display:none">
+      <p style="font-size:10px;font-weight:700;color:var(--pri);margin-bottom:4px">💭 TODAY'S MOTIVATION</p>
+      <p id="daily-quote-text" style="font-size:13px;line-height:1.6;font-style:italic"></p>
+      <p id="daily-quote-cat" style="font-size:10px;color:var(--text-m);margin-top:4px"></p>
+    </div>
+
+    <!-- Study Progress -->
+    <div class="card" style="padding:14px;margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span style="font-size:12px;font-weight:700;color:var(--pri-dark)">📖 Study Progress</span>
+        <span id="progress-label" style="font-size:14px;font-weight:900;color:var(--pri-dark)">0/19</span>
+      </div>
+      <div style="height:10px;background:#f5f0eb;border-radius:6px;overflow:hidden">
+        <div style="display:flex;height:100%">
+          <div id="progress-done-bar" style="width:0%;background:linear-gradient(90deg,var(--mint),#66BB6A);transition:width .5s"></div>
+          <div id="progress-ip-bar" style="width:0%;background:linear-gradient(90deg,#FFD54F,#FFB300);transition:width .5s"></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;margin-top:6px">
+        <span id="prog-done" style="font-size:10px;color:var(--text-m)">✅ 0</span>
+        <span id="prog-ip" style="font-size:10px;color:var(--text-m)">🟡 0</span>
+        <span id="prog-ns" style="font-size:10px;color:var(--text-m)">⬜ 19</span>
+      </div>
+    </div>
+
+    <!-- News -->
+    <div class="card" style="padding:14px;margin-bottom:14px">
+      <p style="font-size:10px;font-weight:700;color:var(--accent);margin-bottom:8px">📰 NEET PG NEWS</p>
+      <div id="home-news"></div>
+    </div>
+
+    <!-- Quick Access -->
+    <p style="font-size:11px;font-weight:700;color:var(--text-l);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Quick Access</p>
+    <div class="quick-grid">
+      <div class="card card-hover quick-card" style="background:linear-gradient(135deg,#FFE4E6,#FFF0F5)" onclick="switchTab('study')">
+        <div style="font-size:26px;margin-bottom:6px">🤖</div>
+        <div style="font-weight:700;font-size:13px">Study AI</div>
+        <div id="qa-study-desc" style="font-size:11px;color:var(--text-l);margin-top:2px">Ask anything</div>
+      </div>
+      <div class="card card-hover quick-card" style="background:linear-gradient(135deg,#EDE7F6,#F3E5F5)" onclick="switchTab('planner')">
+        <div style="font-size:26px;margin-bottom:6px">📋</div>
+        <div style="font-weight:700;font-size:13px">Planner</div>
+        <div id="qa-planner-desc" style="font-size:11px;color:var(--text-l);margin-top:2px">0/19 done</div>
+      </div>
+      <div class="card card-hover quick-card" style="background:linear-gradient(135deg,#FFF3E0,#FFECD2)" onclick="switchTab('motivate')">
+        <div style="font-size:26px;margin-bottom:6px">✨</div>
+        <div style="font-weight:700;font-size:13px">Motivate</div>
+        <div style="font-size:11px;color:var(--text-l);margin-top:2px">Spin the wheel!</div>
+      </div>
+      <div class="card card-hover quick-card" style="background:linear-gradient(135deg,#E8F5E9,#E0F2F1)" onclick="switchTab('resources')">
+        <div style="font-size:26px;margin-bottom:6px">📚</div>
+        <div style="font-weight:700;font-size:13px">Resources</div>
+        <div style="font-size:11px;color:var(--text-l);margin-top:2px">9 links</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STUDY AI -->
+  <div id="tab-study" class="tab">
+    <div class="study-header">
+      <div>
+        <h2 style="font-family:'Playfair Display',serif;font-size:18px;margin:0">🤖 Study Strategist</h2>
+        <p style="font-size:11px;color:var(--text-l);margin-top:2px">Your NEET PG AI mentor</p>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button id="bk-toggle-btn" onclick="toggleBookmarksPanel()" style="background:#fff;color:var(--text);border:1px solid #e8ddd4;border-radius:10px;padding:5px 10px;font-size:12px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700">⭐ <span id="bk-count">0</span></button>
+        <button id="clear-chat-btn" onclick="clearChat()" style="display:none;background:#fff;border:1px solid #e8ddd4;border-radius:10px;padding:5px 10px;font-size:12px;cursor:pointer;font-family:'Nunito',sans-serif;color:var(--text-l)">🗑️</button>
+      </div>
+    </div>
+
+    <div id="bookmarks-panel" class="bookmarks-panel" style="display:none">
+      <p style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:8px">⭐ Saved Tips (<span id="bk-panel-count">0</span>)</p>
+      <div id="bookmarks-list"></div>
+    </div>
+
+    <div id="quick-prompts" class="quick-prompts">
+      <p style="font-size:11px;font-weight:700;color:var(--text-m);margin-bottom:10px">💬 Tap to ask:</p>
+      <div class="prompt-chip" onclick="sendChat('How should I start my NEET PG preparation?')">💬 How should I start my NEET PG preparation?</div>
+      <div class="prompt-chip" onclick="sendChat('Top 5 high-yield topics in Pharmacology')">💬 Top 5 high-yield topics in Pharmacology</div>
+      <div class="prompt-chip" onclick="sendChat('Make me a 6-month study timetable')">💬 Make me a 6-month study timetable</div>
+      <div class="prompt-chip" onclick="sendChat('I\'m struggling with Biochemistry — help me plan')">💬 I'm struggling with Biochemistry — help me plan</div>
+      <div class="prompt-chip" onclick="sendChat('Best strategy for last 3 months revision?')">💬 Best strategy for last 3 months revision?</div>
+      <div class="prompt-chip" onclick="sendChat('How to stay consistent with daily study hours?')">💬 How to stay consistent with daily study hours?</div>
+    </div>
+
+    <div id="chat-messages" class="chat-messages"></div>
+
+    <div class="chat-input-bar">
+      <input id="chat-input" type="text" placeholder="Ask about any subject, topic, strategy..." onkeydown="if(event.key==='Enter')sendChat()">
+      <button class="btn-primary" id="send-btn" onclick="sendChat()" style="padding:10px 16px">Send</button>
+    </div>
+  </div>
+
+  <!-- PLANNER -->
+  <div id="tab-planner" class="tab fu" style="padding:20px 16px">
+    <h2 style="font-family:'Playfair Display',serif;font-size:20px;margin-bottom:2px">📋 Subject Planner</h2>
+    <p style="font-size:12px;color:var(--text-l);margin-bottom:12px">Track progress across all 19 subjects</p>
+
+    <div class="card" style="padding:14px;margin-bottom:14px;background:linear-gradient(135deg,#FFF0F5,#F0E6FF)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span style="font-size:12px;font-weight:700;color:var(--pri-dark)">Overall Progress</span>
+        <span id="planner-progress-label" style="font-size:14px;font-weight:900;color:var(--pri-dark)">0/19</span>
+      </div>
+      <div style="height:10px;background:#fff;border-radius:6px;overflow:hidden">
+        <div style="display:flex;height:100%">
+          <div id="planner-done-bar" style="width:0%;background:linear-gradient(90deg,var(--mint),#66BB6A);transition:width .5s"></div>
+          <div id="planner-ip-bar" style="width:0%;background:linear-gradient(90deg,#FFD54F,#FFB300);transition:width .5s"></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;margin-top:6px">
+        <span id="planner-done-ct" style="font-size:10px;color:var(--text-m)">✅ 0</span>
+        <span id="planner-ip-ct" style="font-size:10px;color:var(--text-m)">🟡 0</span>
+        <span id="planner-ns-ct" style="font-size:10px;color:var(--text-m)">⬜ 19</span>
+      </div>
+    </div>
+
+    <div class="filter-row" id="filter-pills">
+      <button class="pill active" data-filter="all" onclick="setFilter(this,'all')">All (19)</button>
+      <button class="pill" data-filter="high" onclick="setFilter(this,'high')">🔴 High</button>
+      <button class="pill" data-filter="medium" onclick="setFilter(this,'medium')">🟡 Medium</button>
+      <button class="pill" data-filter="quick" onclick="setFilter(this,'quick')">🟢 Quick</button>
+    </div>
+
+    <div id="subjects-list"></div>
+
+    <!-- Weightage Chart -->
+    <div class="card" style="margin-top:14px;padding:14px">
+      <p style="font-size:11px;font-weight:700;color:var(--text-l);margin-bottom:10px">📊 WEIGHTAGE OVERVIEW</p>
+      <div id="weightage-chart"></div>
+    </div>
+  </div>
+
+  <!-- Subject Modal -->
+  <div id="subject-modal" class="modal-overlay" style="display:none">
+    <div class="modal-backdrop" onclick="closeModal()"></div>
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- MOTIVATE -->
+  <div id="tab-motivate" class="tab fu" style="text-align:center">
+    <div style="padding:20px 16px 0">
+      <h2 style="font-family:'Playfair Display',serif;font-size:20px;margin-bottom:2px">✨ Motivation Zone</h2>
+      <p style="font-size:12px;color:var(--text-l);margin-bottom:20px">Spin the wheel for a boost!</p>
+    </div>
+    <div class="card" style="padding:24px;margin:0 16px;display:flex;flex-direction:column;align-items:center">
+      <div class="wheel-wrapper">
+        <div class="wheel-pointer">▼</div>
+        <svg id="wheel-svg" width="260" height="260" viewBox="0 0 260 260"></svg>
+      </div>
+      <button id="spin-btn" class="spin-btn" onclick="spinWheel()">🎡 Spin</button>
+      <div id="spin-quote" class="spin-quote-card" style="display:none"></div>
+    </div>
+  </div>
+
+  <!-- RESOURCES -->
+  <div id="tab-resources" class="tab fu" style="padding:20px 16px">
+    <h2 style="font-family:'Playfair Display',serif;font-size:20px;margin-bottom:2px">📚 Resources & Links</h2>
+    <p style="font-size:12px;color:var(--text-l);margin-bottom:16px">Curated tools for your NEET PG prep</p>
+    <div id="resources-list"></div>
+
+    <div class="card" style="padding:14px;margin-top:8px;margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <p style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin:0">📰 Latest News</p>
+        <button onclick="shuffleNews()" style="background:none;border:1px solid #e8ddd4;border-radius:8px;padding:3px 10px;font-size:10px;cursor:pointer;color:var(--text-l);font-family:'Nunito',sans-serif">Refresh 🔄</button>
+      </div>
+      <div id="resources-news"></div>
+    </div>
+
+    <div class="card" style="padding:14px;background:linear-gradient(135deg,#FFF0F5,#F0E6FF)">
+      <p style="font-size:11px;font-weight:700;color:var(--pri-dark);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">💡 Prep Tips</p>
+      <div id="prep-tips"></div>
+    </div>
+
+    <div style="margin-top:24px;text-align:center">
+      <button onclick="resetAllData()" style="background:none;border:none;font-size:11px;color:var(--text-m);cursor:pointer;text-decoration:underline;font-family:'Nunito',sans-serif">Reset all app data</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Bottom Nav -->
+<nav id="bottom-nav">
+  <button class="nav-btn active" data-tab="home" onclick="switchTab('home')">
+    <span class="nav-icon">🏠</span>
+    <span class="nav-label">Home</span>
+    <div class="nav-dot"></div>
+  </button>
+  <button class="nav-btn" data-tab="study" onclick="switchTab('study')">
+    <span class="nav-icon">🤖</span>
+    <span class="nav-label">Study AI</span>
+    <div class="nav-dot"></div>
+  </button>
+  <button class="nav-btn" data-tab="planner" onclick="switchTab('planner')">
+    <span class="nav-icon">📋</span>
+    <span class="nav-label">Planner</span>
+    <div class="nav-dot"></div>
+  </button>
+  <button class="nav-btn" data-tab="motivate" onclick="switchTab('motivate')">
+    <span class="nav-icon">✨</span>
+    <span class="nav-label">Motivate</span>
+    <div class="nav-dot"></div>
+  </button>
+  <button class="nav-btn" data-tab="resources" onclick="switchTab('resources')">
+    <span class="nav-icon">📚</span>
+    <span class="nav-label">Resources</span>
+    <div class="nav-dot"></div>
+  </button>
+</nav>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// DATA CONSTANTS
+// ═══════════════════════════════════════════════════════
+
+const EXAM_DATE = new Date("2026-08-11T00:00:00");
+
+const KEYS = {
+  subjects: "pgbuddy-subjects",
+  chat: "pgbuddy-chat",
+  bookmarks: "pgbuddy-bookmarks",
+  streak: "pgbuddy-streak"
+};
+
+const SUBJECTS = [
+  { id:"medicine",name:"Medicine",w:8,d:5,tier:"high",color:"#FFFFBA",emoji:"🩺",topics:["Cardiology","Nephrology","Endocrinology","Neurology","Gastroenterology","Pulmonology","Rheumatology"],tip:"Largest subject — start early. Clinical scenarios dominate NEET PG. Integrate with Pathology." },
+  { id:"pharmacology",name:"Pharmacology",w:7.5,d:4,tier:"high",color:"#FFB3BA",emoji:"💊",topics:["ANS Drugs","CVS Pharmacology","Antimicrobials","CNS Drugs","Chemotherapy","Autacoids","Endocrine Pharma"],tip:"Tables are your best friend. Focus on drug classification, MOA, side effects." },
+  { id:"pathology",name:"Pathology",w:7.5,d:4,tier:"high",color:"#FFDFBA",emoji:"🔬",topics:["Hematology","Neoplasia","Immunopathology","Genetic Disorders","Cell Injury","Inflammation","Hemodynamics"],tip:"The bridge subject — connects everything. Learn mechanisms here, apply in Medicine & Surgery." },
+  { id:"surgery",name:"Surgery",w:6,d:4,tier:"high",color:"#BAFFC9",emoji:"🔪",topics:["GI Surgery","Urology","Surgical Oncology","Trauma","Breast","Thyroid & Endocrine","Vascular"],tip:"Classical presentations, investigation of choice, and treatment protocols are key." },
+  { id:"obg",name:"OBG",w:6,d:4,tier:"high",color:"#BAE1FF",emoji:"🤰",topics:["High Risk Pregnancy","Labour","Contraception","Gynec Oncology","Infertility","Menstrual Disorders","USG"],tip:"Obstetrics is predictable. Contraception questions repeat yearly." },
+  { id:"psm",name:"PSM / Community Med",w:6,d:3,tier:"high",color:"#E8BAFF",emoji:"📊",topics:["Epidemiology","Biostatistics","National Health Programs","Nutrition","Environment","Demography","Healthcare Mgmt"],tip:"Memorization goldmine. Flashcards for national programs. Very scoring." },
+  { id:"microbiology",name:"Microbiology",w:5,d:3,tier:"medium",color:"#FFD1DC",emoji:"🦠",topics:["Bacteriology","Virology","Mycology","Parasitology","Immunology","Lab Diagnosis","Vaccines"],tip:"Tables for organisms, culture media, stains. Vaccine schedule is must-know." },
+  { id:"pediatrics",name:"Pediatrics",w:4,d:3,tier:"medium",color:"#C7CEEA",emoji:"👶",topics:["Neonatology","Growth & Development","Nutrition","Immunization","Genetic Disorders","Emergencies","Infections"],tip:"Immunization schedule and milestones asked every year. Neonatology is highest-yield." },
+  { id:"anatomy",name:"Anatomy",w:3.5,d:3,tier:"medium",color:"#C9FFE5",emoji:"🦴",topics:["Upper Limb","Lower Limb","Thorax","Abdomen","Head & Neck","Neuroanatomy","Embryology"],tip:"Neuroanatomy and Embryology are disproportionately high-yield." },
+  { id:"physiology",name:"Physiology",w:3.5,d:3,tier:"medium",color:"#D5BAFF",emoji:"❤️",topics:["CVS","Renal","Respiratory","GIT","Neurophysiology","Endocrine","Blood & Immunity"],tip:"Graphs and mechanisms are favorites. CVS and Renal carry the most weight." },
+  { id:"biochemistry",name:"Biochemistry",w:3.5,d:4,tier:"medium",color:"#FFEEBA",emoji:"🧬",topics:["Enzyme Kinetics","Metabolism","Molecular Biology","Genetics","Nutrition Biochem","Clinical Biochem"],tip:"Metabolic pathways and enzyme deficiency diseases are classics." },
+  { id:"ophthalmology",name:"Ophthalmology",w:3.5,d:3,tier:"medium",color:"#B5EAD7",emoji:"👁️",topics:["Glaucoma","Retinal Disorders","Lens","Cornea","Neuro-ophthalmology","Squint","Refractive Errors"],tip:"Image-based questions very common. Glaucoma and retinal pathology most tested." },
+  { id:"ent",name:"ENT",w:3.5,d:3,tier:"medium",color:"#FFB7B2",emoji:"👂",topics:["Ear Disorders","Nose & PNS","Throat & Larynx","Head & Neck","Audiology","Otitis Media"],tip:"ENT + Ophthal = ~7% of exam. Very scoring short subjects." },
+  { id:"orthopedics",name:"Orthopedics",w:3,d:3,tier:"medium",color:"#FFDAC1",emoji:"🦿",topics:["Fractures","Bone Tumors","Joint Disorders","Spine","Pediatric Ortho","Sports Medicine"],tip:"Classic fracture patterns and named tests repeat every year." },
+  { id:"dermatology",name:"Dermatology",w:2.5,d:2,tier:"quick",color:"#FF9AA2",emoji:"🧴",topics:["Infections","Papulosquamous","Vesiculobullous","Connective Tissue","Pigmentary","STDs"],tip:"Maximum marks per hour. Image-heavy, pattern-based, very predictable." },
+  { id:"fmt",name:"Forensic Medicine",w:2.5,d:2,tier:"quick",color:"#E2F0CB",emoji:"⚖️",topics:["Thanatology","Toxicology","Assault & Injuries","Sexual Offences","Medical Jurisprudence","Identification"],tip:"Toxicology overlaps with Pharmacology. Low effort, reliable marks." },
+  { id:"psychiatry",name:"Psychiatry",w:2,d:2,tier:"quick",color:"#DCD3FF",emoji:"🧠",topics:["Mood Disorders","Schizophrenia","Anxiety Disorders","Substance Abuse","Child Psychiatry","Psychopharmacology"],tip:"DSM criteria and drug treatments. Small, predictable, easy 2%." },
+  { id:"anesthesia",name:"Anesthesia",w:2,d:2,tier:"quick",color:"#FFC8DD",emoji:"😷",topics:["General Anesthesia","Regional Blocks","Pain Management","ICU","Preoperative Assessment","Airway Mgmt"],tip:"Drug doses, types of anesthesia, ASA classification. Airway algorithms are high-yield." },
+  { id:"radiology",name:"Radiology",w:1.5,d:2,tier:"quick",color:"#BDE0FE",emoji:"📡",topics:["X-ray","CT Findings","MRI Basics","USG","Contrast Studies","Nuclear Medicine"],tip:"Learn 30-40 named radiological signs — guaranteed marks every year." },
+];
+
+const TIER_META = {
+  high:   { label:"🔴 High Yield",  bg:"#FED7D7", color:"#C53030" },
+  medium: { label:"🟡 Medium Yield", bg:"#FEFCBF", color:"#975A16" },
+  quick:  { label:"🟢 Quick Win",    bg:"#C6F6D5", color:"#276749" }
+};
+
+const QUOTES = [
+  {t:"You cracked FMGE in one attempt. Let that sink in. You ARE capable of this.",c:"💪 Your Journey"},
+  {t:"You didn't come this far — from Ukraine to India, through FMGE — to only come this far.",c:"💪 Your Journey"},
+  {t:"The girl who left home for Ukraine to chase medicine is still in you. She was fearless. Channel her.",c:"💪 Your Journey"},
+  {t:"When Pharmacology feels like a new language, remember — you literally learned medicine in a different country.",c:"💪 Your Journey"},
+  {t:"Your internship gave you something books can't — clinical intuition. That's your edge in MCQs.",c:"💪 Your Journey"},
+  {t:"You're not starting from zero. You're starting from experience. That's your superpower.",c:"💪 Your Journey"},
+  {t:"FMGE in first attempt. Internship completed. The pattern is clear — you finish what you start.",c:"💪 Your Journey"},
+  {t:"You've survived 100% of your worst days. This exam is just another challenge you'll overcome.",c:"💪 Your Journey"},
+  {t:"The pain of studying is temporary. The pride of being Dr. Sufia, PG, is forever.",c:"💪 Your Journey"},
+  {t:"One year ago you were an intern wondering what's next. Now you're building toward PG. Progress.",c:"💪 Your Journey"},
+  {t:"Consistency beats intensity. 4 focused hours daily beats 12 exhausted hours on weekends.",c:"🧠 Study Truth"},
+  {t:"Some days you'll feel like you're forgetting more than learning. That's your brain reorganizing, not failing.",c:"🧠 Study Truth"},
+  {t:"It's okay to have a bad study day. It's not okay to have two in a row. Reset and restart.",c:"🧠 Study Truth"},
+  {t:"Revision is where marks live. Reading something three times beats reading three things once.",c:"🧠 Study Truth"},
+  {t:"One topic at a time. One day at a time. One question at a time. That's how exams are conquered.",c:"🧠 Study Truth"},
+  {t:"PG prep is a marathon with a sprint finish. Pace yourself wisely.",c:"🧠 Study Truth"},
+  {t:"The best time to start was yesterday. The second best time is right now.",c:"🧠 Study Truth"},
+  {t:"100 MCQs a day. That's what separates toppers from the rest.",c:"🧠 Study Truth"},
+  {t:"A year from now you'll wish you had started today. So start. Right now.",c:"🧠 Study Truth"},
+  {t:"The question paper doesn't know your doubts. It only sees your answers.",c:"📝 Exam Mindset"},
+  {t:"MCQs are just puzzles. And you, Sufia, are a puzzle solver.",c:"📝 Exam Mindset"},
+  {t:"When in doubt on an MCQ, your first instinct is usually right. Trust the hours you've put in.",c:"📝 Exam Mindset"},
+  {t:"Close your eyes and picture your name on that PG merit list. Now open them and get back to work.",c:"📝 Exam Mindset"},
+  {t:"The PG seat you want is waiting — the universe just needs you to prepare enough to claim it.",c:"✨ Believe"},
+  {t:"Doubt kills more dreams than failure ever will.",c:"✨ Believe"},
+  {t:"This time next year, you'll be in a PG department, wondering why you ever doubted yourself.",c:"✨ Believe"},
+  {t:"You are one exam away from the life you've been dreaming about since college. ONE exam.",c:"✨ Believe"},
+  {t:"Every great doctor was once a student who refused to quit.",c:"✨ Believe"},
+  {t:"She believed she could, so she did.",c:"✨ Believe"},
+  {t:"Difficult roads often lead to beautiful destinations. Your destination is that PG seat.",c:"✨ Believe"},
+  {t:"Rest if you must, but don't you quit.",c:"✨ Believe"},
+  {t:"The good physician treats the disease; the great physician treats the patient. — William Osler",c:"🩺 Legends"},
+  {t:"Wherever the art of Medicine is loved, there is also a love of Humanity. — Hippocrates",c:"🩺 Legends"},
+  {t:"Dream is not that which you see while sleeping. It is something that does not let you sleep. — APJ Abdul Kalam",c:"🩺 Legends"},
+  {t:"The best way to find yourself is to lose yourself in the service of others. — Mahatma Gandhi",c:"🩺 Legends"},
+  {t:"In nothing do men more nearly approach the Gods than in giving health to men. — Cicero",c:"🩺 Legends"},
+  {t:"Medicine is a science of uncertainty and an art of probability. — William Osler",c:"🩺 Legends"},
+  {t:"It does not matter how slowly you go as long as you do not stop. — Confucius",c:"🌟 Wisdom"},
+  {t:"Success is not final, failure is not fatal: it is the courage to continue that counts. — Churchill",c:"🌟 Wisdom"},
+  {t:"The future belongs to those who believe in the beauty of their dreams. — Eleanor Roosevelt",c:"🌟 Wisdom"},
+  {t:"You don't have to be great to start, but you have to start to be great. — Zig Ziglar",c:"🌟 Wisdom"},
+  {t:"Genius is 1% inspiration and 99% perspiration. — Thomas Edison",c:"🌟 Wisdom"},
+  {t:"I have not failed. I've found 10,000 ways that won't work. — Thomas Edison",c:"🌟 Wisdom"},
+  {t:"Hardships often prepare ordinary people for an extraordinary destiny. — C.S. Lewis",c:"🌟 Wisdom"},
+  {t:"Your future patients are counting on you. Every page you study brings you closer to them.",c:"🩺 Doctor's Path"},
+  {t:"The stethoscope will feel different once 'PG' is before your name. Worth every late night.",c:"🩺 Doctor's Path"},
+  {t:"Every subject you find hard today is a subject you'll teach juniors about tomorrow.",c:"🩺 Doctor's Path"},
+  {t:"The medical profession is not just a career. It is a calling. And you answered it.",c:"🩺 Doctor's Path"},
+  {t:"Failure is not the opposite of success, it's part of success. — Arianna Huffington",c:"🌟 Wisdom"},
+  {t:"The only way to do great work is to love what you do. — Steve Jobs",c:"🌟 Wisdom"},
+];
+
+const RESOURCES = [
+  {name:"NBE Official Website",url:"https://natboard.edu.in",desc:"Official notifications, hall tickets, results, counselling",emoji:"🏛️",tag:"Official"},
+  {name:"Marrow by Unacademy",url:"https://www.marrow.com",desc:"Video lectures, QBank 20k+ questions, grand tests",emoji:"📺",tag:"Platform"},
+  {name:"PrepLadder",url:"https://www.prepladder.com",desc:"Dr. Bhatia lectures, notes, topic-wise tests",emoji:"📚",tag:"Platform"},
+  {name:"DAMS eLearning",url:"https://www.damsdelhi.com",desc:"Comprehensive coaching & test series",emoji:"🏫",tag:"Coaching"},
+  {name:"Doctors Gang PYQs",url:"https://www.doctorsgang.com",desc:"Previous 10 years papers with explanations",emoji:"📝",tag:"PYQs"},
+  {name:"MedicalStudyZone",url:"https://medicalstudyzone.com",desc:"Free study materials & textbook summaries",emoji:"📖",tag:"Free"},
+  {name:"NEET PG Community",url:"https://t.me/neetpg",desc:"Telegram — discussion, doubts, updates",emoji:"💬",tag:"Community"},
+  {name:"RadioGyan",url:"https://www.radiogyan.com",desc:"Free radiology cases & image atlas",emoji:"📡",tag:"Free"},
+  {name:"Lecturio",url:"https://www.lecturio.com",desc:"International lectures, spaced repetition, QBank",emoji:"🎓",tag:"Platform"},
+];
+
+const FALLBACK_NEWS = [
+  {title:"NEET PG 2026 Expected in August",summary:"Based on recent patterns, NEET PG 2026 is expected around August 11, 2026. Keep checking natboard.edu.in for official confirmation."},
+  {title:"NBE Registration Portal",summary:"Registration typically opens 2-3 months before the exam. Keep your documents ready — MBBS degree, internship completion, FMGE certificate."},
+  {title:"NEET PG Pattern Unchanged",summary:"200 MCQs in 3.5 hours, computer-based. No negative marking confirmed for recent sessions — verify for 2026."},
+  {title:"Counselling Updates",summary:"MCC handles All India Quota counselling. State quotas handled by respective state authorities. Check mcc.nic.in for updates."},
+  {title:"Preparation Tip",summary:"Start grand tests 3-4 months before the exam. Focus on high-yield subjects: Medicine, Pharmacology, Pathology make up ~23% of the paper."},
+];
+
+const SYS_PROMPT = `You are Sufia's personal NEET PG study strategist. Warm, encouraging, deeply practical.
+
+SUFIA: MBBS from Ukraine, cracked FMGE first attempt, completed internship in India. Targeting NEET PG August 2026.
+
+NEET PG: 200 MCQs, 3.5 hours, computer-based.
+Weightage: Medicine 8%, Pharma 7.5%, Patho 7.5%, Surgery 6%, OBG 6%, PSM 6%, Micro 5%, Peds 4%, Anatomy 3.5%, Physio 3.5%, Biochem 3.5%, Ophthal 3.5%, ENT 3.5%, Ortho 3%, Derm 2.5%, FMT 2.5%, Psych 2%, Anes 2%, Radio 1.5%.
+High-yield: Med+Pharma+Patho+Surg+OBG+PSM = 41%. Short subjects (Derm,FMT,Psych,Anes,Radio) = 10.5%, very scoring. ~30-40% concepts repeat from PYQs.
+
+RULES: Under 200 words unless detailed plan requested. Bullet points for plans. Be SPECIFIC with topics. Warm but practical. For subject queries give TOP 5 topics. Reference FMGE success when she doubts. Realistic schedules. Suggest Marrow/PrepLadder/PYQ banks. Use mnemonics. End with one actionable step for TODAY.`;
+
+const GEMINI_API_KEY = "AIzaSyCtdYEjoXV6yW_ob_VHOn8yR3QhP94Wzwc";
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
+
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+let subjectStatus = {};
+let chatMsgs = [];
+let bookmarks = [];
+let streak = { current: 0, longest: 0, lastDate: null };
+let currentTab = "home";
+let plannerFilter = "all";
+let copyFeedback = null;
+let copyFeedbackTimer = null;
+let pendingChatMsg = null;
+let chatBusy = false;
+
+// Wheel state
+let currentWheelAngle = 0;
+let isSpinning = false;
+let spinFrameId = null;
+
+// ═══════════════════════════════════════════════════════
+// STORAGE
+// ═══════════════════════════════════════════════════════
+function loadData(key) {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : null;
+  } catch { return null; }
+}
+
+function saveData(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+    return true;
+  } catch { return false; }
+}
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+function init() {
+  // Load data
+  const chatD = loadData(KEYS.chat);
+  const bkD = loadData(KEYS.bookmarks);
+  const subjD = loadData(KEYS.subjects);
+  const strD = loadData(KEYS.streak);
+
+  if (chatD && Array.isArray(chatD)) chatMsgs = chatD;
+  if (bkD && Array.isArray(bkD)) bookmarks = bkD;
+  if (subjD) subjectStatus = subjD;
+
+  // Streak
+  const today = new Date().toDateString();
+  const yesterday = new Date(Date.now() - 864e5).toDateString();
+  let s = strD || { current: 0, longest: 0, lastDate: null };
+  if (s.lastDate === today) { /* already counted */ }
+  else if (s.lastDate === yesterday) { s = { ...s, current: (s.current || 0) + 1, lastDate: today }; }
+  else { s = { ...s, current: 1, lastDate: today }; }
+  if (s.current > (s.longest || 0)) s.longest = s.current;
+  streak = s;
+  saveData(KEYS.streak, s);
+
+  // Start countdown
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+
+  // Daily quote
+  const doy = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 864e5);
+  const q = QUOTES[doy % QUOTES.length];
+  document.getElementById('daily-quote-text').textContent = `"${q.t}"`;
+  document.getElementById('daily-quote-cat').textContent = q.c;
+  document.getElementById('daily-quote-card').style.display = 'block';
+
+  // Greeting
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+  document.getElementById('greeting-text').textContent = greeting + ",";
+
+  // Streak badge
+  if (streak.current > 0) {
+    document.getElementById('streak-badge').style.display = 'block';
+    document.getElementById('streak-num').textContent = streak.current;
+  }
+
+  // News
+  renderHomeNews();
+
+  // Render static content
+  renderResources();
+  renderPrepTips();
+  renderWeightageChart();
+  buildWheel();
+
+  // Update all progress-dependent UI
+  updateProgressUI();
+  updateSubjectsList();
+  updateChatUI();
+  updateBookmarksUI();
+
+  // Hide loading, show app
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('bottom-nav').style.display = 'flex';
+
+  switchTab('home');
+}
+
+// ═══════════════════════════════════════════════════════
+// COUNTDOWN
+// ═══════════════════════════════════════════════════════
+function updateCountdown() {
+  const diff = EXAM_DATE - new Date();
+  if (diff > 0) {
+    document.getElementById('cd-days').textContent = String(Math.floor(diff / 864e5)).padStart(2, '0');
+    document.getElementById('cd-hours').textContent = String(Math.floor((diff / 36e5) % 24)).padStart(2, '0');
+    document.getElementById('cd-mins').textContent = String(Math.floor((diff / 6e4) % 60)).padStart(2, '0');
+    document.getElementById('cd-secs').textContent = String(Math.floor((diff / 1e3) % 60)).padStart(2, '0');
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// TAB NAVIGATION
+// ═══════════════════════════════════════════════════════
+function switchTab(tabName) {
+  currentTab = tabName;
+
+  // Hide all tabs
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+
+  // Show selected tab
+  const tabEl = document.getElementById('tab-' + tabName);
+  if (tabEl) tabEl.classList.add('active');
+
+  // Update nav
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.tab === tabName);
+  });
+
+  // Close bookmarks panel when switching away from study
+  if (tabName !== 'study') {
+    document.getElementById('bookmarks-panel').style.display = 'none';
+    const bkBtn = document.getElementById('bk-toggle-btn');
+    bkBtn.style.background = '#fff';
+    bkBtn.style.color = 'var(--text)';
+    bkBtn.style.borderColor = '#e8ddd4';
+  }
+
+  // Handle pending chat
+  if (tabName === 'study' && pendingChatMsg) {
+    const msg = pendingChatMsg;
+    pendingChatMsg = null;
+    setTimeout(() => sendChat(msg), 200);
+  }
+
+  // Scroll to top
+  window.scrollTo(0, 0);
+}
+
+// ═══════════════════════════════════════════════════════
+// PROGRESS UI
+// ═══════════════════════════════════════════════════════
+function updateProgressUI() {
+  const doneCount = Object.values(subjectStatus).filter(v => v === "done").length;
+  const ipCount = Object.values(subjectStatus).filter(v => v === "in_progress").length;
+  const nsCount = 19 - doneCount - ipCount;
+
+  // Home tab
+  document.getElementById('progress-label').textContent = `${doneCount}/19`;
+  document.getElementById('progress-done-bar').style.width = `${(doneCount / 19) * 100}%`;
+  document.getElementById('progress-ip-bar').style.width = `${(ipCount / 19) * 100}%`;
+  document.getElementById('prog-done').textContent = `✅ ${doneCount}`;
+  document.getElementById('prog-ip').textContent = `🟡 ${ipCount}`;
+  document.getElementById('prog-ns').textContent = `⬜ ${nsCount}`;
+
+  // Quick access
+  document.getElementById('qa-planner-desc').textContent = `${doneCount}/19 done`;
+
+  // Planner tab
+  document.getElementById('planner-progress-label').textContent = `${doneCount}/19`;
+  document.getElementById('planner-done-bar').style.width = `${(doneCount / 19) * 100}%`;
+  document.getElementById('planner-ip-bar').style.width = `${(ipCount / 19) * 100}%`;
+  document.getElementById('planner-done-ct').textContent = `✅ ${doneCount}`;
+  document.getElementById('planner-ip-ct').textContent = `🟡 ${ipCount}`;
+  document.getElementById('planner-ns-ct').textContent = `⬜ ${nsCount}`;
+}
+
+// ═══════════════════════════════════════════════════════
+// NEWS
+// ═══════════════════════════════════════════════════════
+let newsOrder = [...FALLBACK_NEWS];
+
+function renderHomeNews() {
+  const el = document.getElementById('home-news');
+  el.innerHTML = newsOrder.slice(0, 3).map(n => `
+    <div style="padding:7px 10px;background:var(--bg);border-radius:8px;margin-bottom:5px;font-size:12px">
+      <span style="font-weight:700">${escHtml(n.title)}</span>
+      ${n.summary ? `<p style="font-size:11px;color:var(--text-l);margin-top:2px;line-height:1.4">${escHtml(n.summary)}</p>` : ''}
+    </div>
+  `).join('');
+}
+
+function renderResourcesNews() {
+  const el = document.getElementById('resources-news');
+  el.innerHTML = newsOrder.map(n => `
+    <div style="padding:8px 10px;background:var(--bg);border-radius:8px;margin-bottom:6px">
+      <p style="font-size:12px;font-weight:700">📌 ${escHtml(n.title)}</p>
+      ${n.summary ? `<p style="font-size:11px;color:var(--text-l);margin-top:2px;line-height:1.4">${escHtml(n.summary)}</p>` : ''}
+    </div>
+  `).join('');
+}
+
+function shuffleNews() {
+  newsOrder = [...FALLBACK_NEWS].sort(() => Math.random() - 0.5);
+  renderHomeNews();
+  renderResourcesNews();
+}
+
+// ═══════════════════════════════════════════════════════
+// RESOURCES
+// ═══════════════════════════════════════════════════════
+function renderResources() {
+  document.getElementById('resources-list').innerHTML = RESOURCES.map(r => `
+    <a href="${r.url}" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit;display:block;margin-bottom:8px">
+      <div class="card card-hover" style="padding:12px 14px;display:flex;align-items:center;gap:10px">
+        <div style="font-size:26px;width:38px;text-align:center">${r.emoji}</div>
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="font-weight:700;font-size:13px">${escHtml(r.name)}</span>
+            <span style="font-size:9px;padding:1px 6px;border-radius:5px;background:var(--pri-soft);color:var(--pri-dark);font-weight:700">${escHtml(r.tag)}</span>
+          </div>
+          <p style="font-size:11px;color:var(--text-l);margin-top:2px">${escHtml(r.desc)}</p>
+        </div>
+        <span style="color:var(--pri);font-size:14px">↗</span>
+      </div>
+    </a>
+  `).join('');
+
+  renderResourcesNews();
+}
+
+function renderPrepTips() {
+  const tips = [
+    "Do 100+ MCQs daily from Day 1, even before finishing reading.",
+    "3:1 rule — 3 parts revision to 1 part new topics.",
+    "PYQs are GOLD. ~35% concepts repeat from previous years.",
+    "Subscribe to NBE email alerts — never miss a deadline.",
+    "Short subjects = highest marks per hour. Don't skip them.",
+    "Find a study partner for accountability.",
+    "Start grand tests 3+ months before the exam.",
+  ];
+  document.getElementById('prep-tips').innerHTML = tips.map(tip => `
+    <div style="display:flex;gap:6px;margin-bottom:7px;align-items:flex-start">
+      <span style="color:var(--mint);font-weight:800;font-size:12px">✓</span>
+      <p style="font-size:12px;line-height:1.5">${escHtml(tip)}</p>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// PLANNER
+// ═══════════════════════════════════════════════════════
+const STATUS_ICON = { undefined: "⬜", in_progress: "🟡", done: "✅" };
+const STATUS_LABEL = { undefined: "Not Started", in_progress: "In Progress", done: "Completed" };
+
+function setFilter(btn, filter) {
+  plannerFilter = filter;
+  document.querySelectorAll('#filter-pills .pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  updateSubjectsList();
+}
+
+function updateSubjectsList() {
+  const filtered = plannerFilter === 'all' ? SUBJECTS : SUBJECTS.filter(s => s.tier === plannerFilter);
+  const el = document.getElementById('subjects-list');
+  el.innerHTML = filtered.map(s => {
+    const status = subjectStatus[s.id];
+    const tm = TIER_META[s.tier];
+    return `
+      <div class="card card-hover subject-card" onclick="openModal('${s.id}')" style="border-left:4px solid ${s.color}">
+        <div style="font-size:26px;width:38px;text-align:center">${s.emoji}</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-weight:700;font-size:13px">${escHtml(s.name)}</span>
+            <span style="font-size:12px;font-weight:800;color:var(--pri-dark)">${s.w}%</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:3px">
+            <span style="font-size:10px;padding:1px 6px;border-radius:5px;background:${tm.bg};color:${tm.color};font-weight:700">${tm.label}</span>
+            <span style="font-size:10px;color:var(--text-m)">${'⭐'.repeat(s.d)}</span>
+          </div>
+        </div>
+        <div onclick="event.stopPropagation();cycleStatus('${s.id}')" style="font-size:20px;padding:4px;cursor:pointer">${STATUS_ICON[status]}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function cycleStatus(id) {
+  const order = [undefined, "in_progress", "done"];
+  const cur = subjectStatus[id];
+  const next = order[(order.indexOf(cur) + 1) % 3];
+  const updated = { ...subjectStatus };
+  if (next === undefined) delete updated[id];
+  else updated[id] = next;
+  subjectStatus = updated;
+  saveData(KEYS.subjects, updated);
+  updateProgressUI();
+  updateSubjectsList();
+  // Refresh modal if open
+  if (document.getElementById('subject-modal').style.display !== 'none') {
+    const cur = currentOpenSubjectId;
+    if (cur) renderModalBody(cur);
+  }
+}
+
+let currentOpenSubjectId = null;
+
+function openModal(id) {
+  currentOpenSubjectId = id;
+  renderModalBody(id);
+  document.getElementById('subject-modal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function renderModalBody(id) {
+  const s = SUBJECTS.find(x => x.id === id);
+  if (!s) return;
+  const tm = TIER_META[s.tier];
+  const status = subjectStatus[s.id];
+  document.getElementById('modal-body').innerHTML = `
+    <div style="font-size:34px;margin-bottom:6px">${s.emoji}</div>
+    <h3 style="font-family:'Playfair Display',serif;font-size:20px;margin-bottom:6px">${escHtml(s.name)}</h3>
+    <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;background:${tm.bg};color:${tm.color}">${tm.label}</span>
+    <div onclick="cycleStatus('${s.id}')" style="margin:12px 0;padding:10px 14px;background:var(--bg);border-radius:12px;cursor:pointer;display:flex;align-items:center;gap:8px">
+      <span style="font-size:22px">${STATUS_ICON[status]}</span>
+      <div>
+        <div style="font-size:13px;font-weight:700">${STATUS_LABEL[status]}</div>
+        <div style="font-size:10px;color:var(--text-m)">Tap to change</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:4px 0 12px">
+      <div style="background:var(--bg);border-radius:10px;padding:10px;text-align:center">
+        <div style="font-size:20px;font-weight:800;color:var(--pri-dark)">${s.w}%</div>
+        <div style="font-size:10px;color:var(--text-m)">of NEET PG</div>
+      </div>
+      <div style="background:var(--bg);border-radius:10px;padding:10px;text-align:center">
+        <div style="font-size:14px">${'⭐'.repeat(s.d)}${'☆'.repeat(5 - s.d)}</div>
+        <div style="font-size:10px;color:var(--text-m)">Difficulty</div>
+      </div>
+    </div>
+    <p style="font-size:11px;font-weight:700;color:var(--text-l);margin-bottom:6px">🎯 HIGH-YIELD TOPICS</p>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px">
+      ${s.topics.map(t => `<span class="topic-tag" style="background:${s.color}55">${escHtml(t)}</span>`).join('')}
+    </div>
+    <div style="background:var(--bg);border-radius:10px;padding:10px;border-left:3px solid var(--accent);margin-bottom:14px">
+      <p style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:3px">💡 STRATEGY</p>
+      <p style="font-size:12px;line-height:1.5">${escHtml(s.tip)}</p>
+    </div>
+    <button class="btn-primary" onclick="askAIForSubject('${s.id}')" style="width:100%">🤖 Ask AI for Strategy →</button>
+  `;
+}
+
+function closeModal() {
+  document.getElementById('subject-modal').style.display = 'none';
+  document.body.style.overflow = '';
+  currentOpenSubjectId = null;
+}
+
+function askAIForSubject(id) {
+  const s = SUBJECTS.find(x => x.id === id);
+  if (!s) return;
+  closeModal();
+  pendingChatMsg = `Give me a detailed NEET PG study plan for ${s.name} — top 5 topics, time allocation, best approach`;
+  switchTab('study');
+}
+
+function renderWeightageChart() {
+  const top8 = [...SUBJECTS].sort((a, b) => b.w - a.w).slice(0, 8);
+  document.getElementById('weightage-chart').innerHTML = top8.map(s => `
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:7px">
+      <span style="font-size:11px;width:55px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${s.emoji}${s.name.split(' ')[0].slice(0, 6)}</span>
+      <div style="flex:1;height:8px;background:#f5f0eb;border-radius:4px;overflow:hidden">
+        <div style="width:${(s.w / 8) * 100}%;height:100%;background:linear-gradient(90deg,${s.color},var(--pri));border-radius:4px"></div>
+      </div>
+      <span style="font-size:10px;font-weight:700;color:var(--text-l);width:28px;text-align:right">${s.w}%</span>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// CHAT
+// ═══════════════════════════════════════════════════════
+function updateChatUI() {
+  const msgEl = document.getElementById('chat-messages');
+  const promptsEl = document.getElementById('quick-prompts');
+  const clearBtn = document.getElementById('clear-chat-btn');
+  const bkToggle = document.getElementById('bk-toggle-btn');
+
+  // Show/hide quick prompts
+  const bkPanelVisible = document.getElementById('bookmarks-panel').style.display !== 'none';
+  promptsEl.style.display = (chatMsgs.length === 0 && !bkPanelVisible) ? 'block' : 'none';
+
+  // Clear btn
+  clearBtn.style.display = chatMsgs.length > 0 ? 'block' : 'none';
+
+  // Bookmark count
+  document.getElementById('bk-count').textContent = bookmarks.length;
+
+  // Quick access desc
+  document.getElementById('qa-study-desc').textContent = chatMsgs.length > 0 ? `${chatMsgs.length} msgs` : 'Ask anything';
+
+  // Render messages
+  msgEl.innerHTML = chatMsgs.map((msg, i) => {
+    if (msg.role === 'user') {
+      return `<div style="display:flex;justify-content:flex-end"><div class="msg-bubble msg-user">${escHtml(msg.text)}</div></div>`;
+    } else {
+      const isBk = bookmarks.some(b => b.text === msg.text);
+      return `
+        <div style="display:flex;justify-content:flex-start">
+          <div class="msg-bubble msg-ai" id="msg-${i}">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+              <span style="font-size:10px;font-weight:700;color:var(--pri)">🤖 Study AI</span>
+              <div style="display:flex;gap:4px">
+                <button onclick="copyText(${JSON.stringify(msg.text)}, this)" style="background:none;border:none;cursor:pointer;font-size:14px;padding:0">📋</button>
+                <button onclick="toggleBookmark(${i})" style="background:none;border:none;cursor:pointer;font-size:14px;padding:0">${isBk ? '⭐' : '☆'}</button>
+              </div>
+            </div>
+            ${escHtmlPre(msg.text)}
+          </div>
+        </div>
+      `;
+    }
+  }).join('');
+
+  // Scroll to bottom
+  msgEl.scrollTop = msgEl.scrollHeight;
+}
+
+async function sendChat(overrideMsg) {
+  const input = document.getElementById('chat-input');
+  const msg = overrideMsg || input.value.trim();
+  if (!msg || chatBusy) return;
+  input.value = '';
+  chatBusy = true;
+
+  const newMsgs = [...chatMsgs, { role: "user", text: msg, ts: Date.now() }];
+  chatMsgs = newMsgs;
+  updateChatUI();
+  showTyping();
+
+  const sendBtn = document.getElementById('send-btn');
+  sendBtn.disabled = true;
+
+  try {
+    const recentHistory = newMsgs.slice(-20);
+    const contents = recentHistory.map(m => ({
+      role: m.role === "user" ? "user" : "model",
+      parts: [{ text: m.text }]
+    }));
+
+    const response = await fetch(GEMINI_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: SYS_PROMPT }] },
+        contents: contents,
+        generationConfig: { maxOutputTokens: 1000, temperature: 0.7 }
+      })
+    });
+
+    const data = await response.json();
+    let reply;
+
+    if (response.status === 429) {
+      reply = "Taking a short break — I'll be back in a minute! In the meantime, check out the Subject Planner for study tips. 📋";
+    } else if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+      reply = data.candidates[0].content.parts.map(p => p.text).join("\n");
+    } else {
+      reply = "Couldn't connect right now — but you've got this! Try again in a moment. 💪";
+    }
+
+    chatMsgs = [...newMsgs, { role: "assistant", text: reply, ts: Date.now() }];
+    saveData(KEYS.chat, chatMsgs.slice(-50));
+  } catch {
+    chatMsgs = [...newMsgs, { role: "assistant", text: "Couldn't connect right now — but you've got this! Try again in a moment. 💪", ts: Date.now() }];
+  }
+
+  chatBusy = false;
+  sendBtn.disabled = false;
+  hideTyping();
+  updateChatUI();
+}
+
+function showTyping() {
+  const msgEl = document.getElementById('chat-messages');
+  const typing = document.createElement('div');
+  typing.id = 'typing-indicator';
+  typing.style.display = 'flex';
+  typing.innerHTML = `<div class="typing-dots">${[0,1,2].map(i => `<div class="typing-dot" style="animation:pulse 1s ease ${i * .15}s infinite"></div>`).join('')}</div>`;
+  msgEl.appendChild(typing);
+  msgEl.scrollTop = msgEl.scrollHeight;
+}
+
+function hideTyping() {
+  const typing = document.getElementById('typing-indicator');
+  if (typing) typing.remove();
+}
+
+function clearChat() {
+  if (confirm("Clear all chat history?")) {
+    chatMsgs = [];
+    saveData(KEYS.chat, []);
+    updateChatUI();
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// BOOKMARKS
+// ═══════════════════════════════════════════════════════
+function toggleBookmarksPanel() {
+  const panel = document.getElementById('bookmarks-panel');
+  const btn = document.getElementById('bk-toggle-btn');
+  const isVisible = panel.style.display !== 'none';
+  panel.style.display = isVisible ? 'none' : 'block';
+  btn.style.background = isVisible ? '#fff' : 'var(--pri)';
+  btn.style.color = isVisible ? 'var(--text)' : '#fff';
+  btn.style.borderColor = isVisible ? '#e8ddd4' : 'var(--pri)';
+
+  // Hide quick prompts when bookmarks shown
+  const promptsEl = document.getElementById('quick-prompts');
+  if (!isVisible) {
+    promptsEl.style.display = 'none';
+  } else if (chatMsgs.length === 0) {
+    promptsEl.style.display = 'block';
+  }
+
+  updateBookmarksUI();
+}
+
+function updateBookmarksUI() {
+  document.getElementById('bk-count').textContent = bookmarks.length;
+  document.getElementById('bk-panel-count').textContent = bookmarks.length;
+
+  const list = document.getElementById('bookmarks-list');
+  if (bookmarks.length === 0) {
+    list.innerHTML = `<p style="font-size:12px;color:var(--text-m);padding:8px 0">Tap ⭐ on any AI response to save it!</p>`;
+    return;
+  }
+  list.innerHTML = [...bookmarks].reverse().map((b, i) => {
+    const origIdx = bookmarks.length - 1 - i;
+    const preview = b.text.length > 160 ? b.text.slice(0, 160) + '...' : b.text;
+    return `
+      <div style="padding:8px;background:#fff;border-radius:10px;margin-bottom:6px;font-size:12px;line-height:1.5;position:relative">
+        <div style="padding-right:50px">${escHtml(preview)}</div>
+        <div style="position:absolute;top:6px;right:6px;display:flex;gap:4px">
+          <button onclick="copyText(${JSON.stringify(b.text)}, this)" style="background:none;border:none;cursor:pointer;font-size:14px;padding:2px">📋</button>
+          <button onclick="removeBookmark(${origIdx})" style="background:none;border:none;cursor:pointer;font-size:12px;padding:2px;color:#999">✕</button>
+        </div>
+        <div style="font-size:10px;color:var(--text-m);margin-top:4px">${new Date(b.ts).toLocaleDateString()}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function toggleBookmark(msgIdx) {
+  const msg = chatMsgs[msgIdx];
+  if (!msg) return;
+  const exists = bookmarks.some(b => b.text === msg.text);
+  if (exists) {
+    bookmarks = bookmarks.filter(b => b.text !== msg.text);
+  } else {
+    bookmarks = [...bookmarks, { text: msg.text, ts: Date.now() }];
+  }
+  saveData(KEYS.bookmarks, bookmarks);
+  updateChatUI();
+  updateBookmarksUI();
+}
+
+function removeBookmark(idx) {
+  bookmarks.splice(idx, 1);
+  saveData(KEYS.bookmarks, bookmarks);
+  updateBookmarksUI();
+  updateChatUI();
+}
+
+// ═══════════════════════════════════════════════════════
+// COPY
+// ═══════════════════════════════════════════════════════
+function copyText(text, btn) {
+  try {
+    navigator.clipboard.writeText(text).then(() => {
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = '✓';
+        setTimeout(() => { btn.textContent = orig; }, 1500);
+      }
+    });
+  } catch {
+    // fallback
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    ta.remove();
+    if (btn) {
+      const orig = btn.textContent;
+      btn.textContent = '✓';
+      setTimeout(() => { btn.textContent = orig; }, 1500);
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// SPIN WHEEL
+// ═══════════════════════════════════════════════════════
+const WC = ["#FFB3BA","#FFDDB5","#FFFFBA","#BAFFC9","#BAE1FF","#E8BAFF","#FFD1DC","#C9FFE5"];
+const WL = ["💪","🩺","🧠","📝","✨","🌟","🎯","💫"];
+
+function buildWheel() {
+  const svg = document.getElementById('wheel-svg');
+  let paths = '';
+  for (let i = 0; i < 8; i++) {
+    const a = i * 45;
+    const r1 = (a - 90) * Math.PI / 180;
+    const r2 = (a + 45 - 90) * Math.PI / 180;
+    const mr = (a + 22.5 - 90) * Math.PI / 180;
+    const x1 = 130 + 120 * Math.cos(r1), y1 = 130 + 120 * Math.sin(r1);
+    const x2 = 130 + 120 * Math.cos(r2), y2 = 130 + 120 * Math.sin(r2);
+    const tx = 130 + 78 * Math.cos(mr), ty = 130 + 78 * Math.sin(mr);
+    paths += `<path d="M130,130 L${x1},${y1} A120,120 0 0,1 ${x2},${y2} Z" fill="${WC[i]}" stroke="#fff" stroke-width="2.5"/>`;
+    paths += `<text x="${tx}" y="${ty}" text-anchor="middle" dominant-baseline="central" font-size="28">${WL[i]}</text>`;
+  }
+  paths += `<circle cx="130" cy="130" r="26" fill="#fff" stroke="var(--pri)" stroke-width="3"/>`;
+  paths += `<text x="130" y="134" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--pri-dark)">✨</text>`;
+  svg.innerHTML = paths;
+}
+
+function spinWheel() {
+  if (isSpinning) return;
+  isSpinning = true;
+  document.getElementById('spin-quote').style.display = 'none';
+  const spinBtn = document.getElementById('spin-btn');
+  spinBtn.disabled = true;
+  spinBtn.textContent = '✨ Spinning...';
+
+  const totalRotation = 1800 + Math.random() * 1800;
+  const duration = 3500;
+  const startTime = performance.now();
+  const startAngle = currentWheelAngle;
+
+  function animate(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    currentWheelAngle = startAngle + totalRotation * eased;
+    document.getElementById('wheel-svg').style.transform = `rotate(${currentWheelAngle}deg)`;
+
+    if (progress < 1) {
+      spinFrameId = requestAnimationFrame(animate);
+    } else {
+      isSpinning = false;
+      spinBtn.disabled = false;
+      spinBtn.textContent = '🎡 Spin';
+      const quote = QUOTES[Math.floor(Math.random() * QUOTES.length)];
+      const qEl = document.getElementById('spin-quote');
+      qEl.innerHTML = `
+        <p style="font-size:10px;font-weight:700;color:var(--pri);margin-bottom:6px">${escHtml(quote.c)}</p>
+        <p style="font-size:15px;line-height:1.7;font-style:italic;color:var(--text)">"${escHtml(quote.t)}"</p>
+        <button onclick="copyText(${JSON.stringify(quote.t)}, this)" style="margin-top:10px;background:none;border:1px solid var(--pri);border-radius:20px;padding:5px 14px;font-size:12px;cursor:pointer;color:var(--pri-dark);font-family:'Nunito',sans-serif;font-weight:700">📋 Copy</button>
+      `;
+      qEl.style.display = 'block';
+    }
+  }
+  spinFrameId = requestAnimationFrame(animate);
+}
+
+// ═══════════════════════════════════════════════════════
+// RESET
+// ═══════════════════════════════════════════════════════
+function resetAllData() {
+  if (confirm("Reset ALL data? Chat, bookmarks, progress, streak — all gone.")) {
+    if (confirm("Really sure?")) {
+      saveData(KEYS.chat, []);
+      saveData(KEYS.bookmarks, []);
+      saveData(KEYS.subjects, {});
+      const newStreak = { current: 1, longest: 1, lastDate: new Date().toDateString() };
+      saveData(KEYS.streak, newStreak);
+      chatMsgs = [];
+      bookmarks = [];
+      subjectStatus = {};
+      streak = newStreak;
+      updateProgressUI();
+      updateSubjectsList();
+      updateChatUI();
+      updateBookmarksUI();
+      document.getElementById('streak-badge').style.display = 'block';
+      document.getElementById('streak-num').textContent = 1;
+      alert("Reset done.");
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function escHtmlPre(str) {
+  // Escape HTML but preserve line breaks
+  return escHtml(str).replace(/\n/g, '<br>');
+}
+
+// ═══════════════════════════════════════════════════════
+// START
+// ═══════════════════════════════════════════════════════
+// Give fonts a moment to load then init
+if (document.fonts) {
+  document.fonts.ready.then(init);
+} else {
+  setTimeout(init, 300);
+}
+</script>
+</body>
+</html>
