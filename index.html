@@ -164,6 +164,31 @@
 
   /* ── RESOURCES ── */
   #tab-resources { padding: 20px 16px; }
+
+  /* ── NEWS TAB ── */
+  #tab-news { padding: 20px 16px; }
+  .news-card {
+    background: var(--card); border-radius: 12px; padding: 12px 14px;
+    margin-bottom: 8px; box-shadow: var(--shadow);
+    cursor: pointer; transition: box-shadow .2s, transform .2s;
+    text-decoration: none; color: inherit; display: block;
+  }
+  .news-card:active { box-shadow: var(--shadow-h); transform: translateY(-1px); }
+  .news-card-source { font-size: 10px; color: var(--text-m); font-weight: 700; margin-bottom: 3px; }
+  .news-card-title  { font-size: 13px; font-weight: 700; line-height: 1.4; }
+  .news-card-date   { font-size: 10px; color: var(--text-m); margin-top: 4px; }
+
+  /* skeleton shimmer */
+  @keyframes shimmer { 0%{background-position:-400px 0} 100%{background-position:400px 0} }
+  .skeleton {
+    background: linear-gradient(90deg,#f0ebe6 25%,#faf6f2 50%,#f0ebe6 75%);
+    background-size: 400px 100%;
+    animation: shimmer 1.4s ease-in-out infinite;
+    border-radius: 12px;
+    height: 66px;
+    margin-bottom: 8px;
+  }
+  .skeleton-sm { height: 48px; border-radius: 8px; margin-bottom: 0; }
 </style>
 </head>
 <body>
@@ -240,11 +265,12 @@
       </div>
     </div>
 
-    <!-- Daily quote -->
-    <div id="daily-quote-card" class="card" style="display:none;padding:14px;margin-bottom:14px;border-left:4px solid var(--pri)">
-      <p style="font-size:10px;font-weight:700;color:var(--pri);margin-bottom:4px">💭 TODAY'S MOTIVATION</p>
-      <p id="daily-quote-text" style="font-size:13px;line-height:1.6;font-style:italic"></p>
-      <p id="daily-quote-cat" style="font-size:10px;color:var(--text-m);margin-top:4px"></p>
+    <!-- Daily quote (live from ZenQuotes, fallback to local) -->
+    <div id="daily-quote-card" class="card" style="padding:14px;margin-bottom:14px;border-left:4px solid var(--pri)">
+      <p style="font-size:10px;font-weight:700;color:var(--pri);margin-bottom:6px">💭 TODAY'S MOTIVATION</p>
+      <div id="daily-quote-skeleton" class="skeleton skeleton-sm"></div>
+      <p id="daily-quote-text" style="display:none;font-size:13px;line-height:1.6;font-style:italic"></p>
+      <p id="daily-quote-author" style="display:none;font-size:10px;color:var(--text-m);margin-top:4px"></p>
     </div>
 
     <!-- Study progress -->
@@ -266,15 +292,18 @@
       </div>
     </div>
 
-    <!-- News -->
+    <!-- News (live NEET PG feed, fallback to static) -->
     <div class="card" style="padding:14px;margin-bottom:14px">
-      <p style="font-size:10px;font-weight:700;color:var(--accent);margin-bottom:8px">📰 NEET PG NEWS</p>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <p style="font-size:10px;font-weight:700;color:var(--accent);margin:0">📰 NEET PG NEWS</p>
+        <button onclick="switchTab('news')" style="background:none;border:none;font-size:10px;color:var(--pri-dark);font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;padding:0">See all →</button>
+      </div>
       <div id="home-news"></div>
     </div>
 
-    <!-- Quick access — 3 cards (no Study AI) -->
+    <!-- Quick access — 4 cards -->
     <p style="font-size:11px;font-weight:700;color:var(--text-l);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Quick Access</p>
-    <div class="quick-grid" style="grid-template-columns:1fr 1fr 1fr">
+    <div class="quick-grid">
       <div class="card card-hover quick-card" style="background:linear-gradient(135deg,#EDE7F6,#F3E5F5)" onclick="switchTab('planner')">
         <div style="font-size:26px;margin-bottom:6px">📋</div>
         <div style="font-weight:700;font-size:13px">Planner</div>
@@ -284,6 +313,11 @@
         <div style="font-size:26px;margin-bottom:6px">✨</div>
         <div style="font-weight:700;font-size:13px">Motivate</div>
         <div style="font-size:11px;color:var(--text-l);margin-top:2px">Spin the wheel!</div>
+      </div>
+      <div class="card card-hover quick-card" style="background:linear-gradient(135deg,#E3F2FD,#E8EAF6)" onclick="switchTab('news')">
+        <div style="font-size:26px;margin-bottom:6px">📰</div>
+        <div style="font-weight:700;font-size:13px">News</div>
+        <div style="font-size:11px;color:var(--text-l);margin-top:2px">Live updates</div>
       </div>
       <div class="card card-hover quick-card" style="background:linear-gradient(135deg,#E8F5E9,#E0F2F1)" onclick="switchTab('resources')">
         <div style="font-size:26px;margin-bottom:6px">📚</div>
@@ -360,6 +394,44 @@
     </div>
   </div>
 
+  <!-- ═══ NEWS ═══ -->
+  <div id="tab-news" class="tab-section fu">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+      <h2 style="font-family:'Playfair Display',serif;font-size:20px">📰 PG News</h2>
+      <button id="news-refresh-btn" onclick="fetchAllNews()" style="background:none;border:1px solid #e8ddd4;border-radius:8px;padding:4px 12px;font-size:11px;cursor:pointer;color:var(--text-l);font-family:'Nunito',sans-serif;font-weight:700">Refresh 🔄</button>
+    </div>
+    <p style="font-size:12px;color:var(--text-l);margin-bottom:16px">Live feeds for NEET PG, clinical medicine & India health</p>
+
+    <!-- NEET PG Updates -->
+    <div style="margin-bottom:16px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <span style="font-size:14px;font-weight:800;color:var(--pri-dark)">🎯 NEET PG Updates</span>
+        <span style="font-size:9px;background:var(--pri-soft);color:var(--pri-dark);padding:2px 7px;border-radius:10px;font-weight:700">Google News</span>
+      </div>
+      <div id="news-neetpg"></div>
+    </div>
+
+    <!-- Clinical Buzz -->
+    <div style="margin-bottom:16px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <span style="font-size:14px;font-weight:800;color:#6B4E8A">🩺 Clinical Buzz</span>
+        <span style="font-size:9px;background:var(--sec-soft);color:#6B4E8A;padding:2px 7px;border-radius:10px;font-weight:700">Medscape</span>
+      </div>
+      <div id="news-clinical"></div>
+    </div>
+
+    <!-- India Medical News -->
+    <div style="margin-bottom:16px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <span style="font-size:14px;font-weight:800;color:#C06000">🇮🇳 India Medical News</span>
+        <span style="font-size:9px;background:var(--accent-soft);color:#C06000;padding:2px 7px;border-radius:10px;font-weight:700">Medical Dialogues</span>
+      </div>
+      <div id="news-india"></div>
+    </div>
+
+    <p style="font-size:10px;color:var(--text-m);text-align:center;padding-bottom:8px">Articles open in your browser. Sources: Google News, Medscape, Medical Dialogues.</p>
+  </div>
+
   <!-- ═══ RESOURCES ═══ -->
   <div id="tab-resources" class="tab-section fu" style="padding:20px 16px">
     <h2 style="font-family:'Playfair Display',serif;font-size:20px;margin-bottom:2px">📚 Resources & Links</h2>
@@ -386,7 +458,7 @@
 
 </div><!-- /#app -->
 
-<!-- ═══ BOTTOM NAV — 4 tabs, no Study AI ═══ -->
+<!-- ═══ BOTTOM NAV — 5 tabs ═══ -->
 <nav id="bottom-nav" style="display:none">
   <button class="nav-btn" data-tab="home" onclick="switchTab('home')">
     <span class="nav-icon">🏠</span>
@@ -401,6 +473,11 @@
   <button class="nav-btn" data-tab="motivate" onclick="switchTab('motivate')">
     <span class="nav-icon">✨</span>
     <span class="nav-label">Motivate</span>
+    <div class="nav-dot"></div>
+  </button>
+  <button class="nav-btn" data-tab="news" onclick="switchTab('news')">
+    <span class="nav-icon">📰</span>
+    <span class="nav-label">News</span>
     <div class="nav-dot"></div>
   </button>
   <button class="nav-btn" data-tab="resources" onclick="switchTab('resources')">
@@ -550,17 +627,16 @@ function saveData(key, val) {
 }
 
 // ═══════════════════════════════════════════════════════
-// NAVIGATION — the core fix
+// NAVIGATION
 // ═══════════════════════════════════════════════════════
+let newsTabLoaded = false;
+
 function switchTab(tabId) {
-  // Hide every section
   document.querySelectorAll('.tab-section').forEach(el => { el.style.display = 'none'; });
 
-  // Show only the requested section
   const section = document.getElementById('tab-' + tabId);
   if (section) section.style.display = 'block';
 
-  // Update nav button active states
   document.querySelectorAll('.nav-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.tab === tabId);
   });
@@ -599,19 +675,14 @@ function init() {
     document.getElementById('streak-num').textContent = streak.current;
   }
 
-  // Daily quote (deterministic by day-of-year)
-  const doy = Math.floor((new Date() - new Date(new Date().getFullYear(),0,0)) / 864e5);
-  const q   = QUOTES[doy % QUOTES.length];
-  document.getElementById('daily-quote-text').textContent = `"${q.t}"`;
-  document.getElementById('daily-quote-cat').textContent  = q.c;
-  document.getElementById('daily-quote-card').style.display = 'block';
+  // Daily quote — try ZenQuotes, fall back to local
+  fetchDailyQuote();
 
   // Countdown
   updateCountdown();
   setInterval(updateCountdown, 1000);
 
   // Render static content
-  renderHomeNews();
   renderResources();
   renderPrepTips();
   renderSubjectsList();
@@ -628,6 +699,10 @@ function init() {
 
   // Start on Home tab
   switchTab('home');
+
+  // Kick off live data fetches (non-blocking)
+  fetchHomeNews();
+  fetchAllNews();
 }
 
 // ═══════════════════════════════════════════════════════
@@ -669,14 +744,151 @@ function updateProgressUI() {
 }
 
 // ═══════════════════════════════════════════════════════
-// NEWS
+// LIVE QUOTE — ZenQuotes (no-key, CORS-friendly via proxy)
 // ═══════════════════════════════════════════════════════
-function renderHomeNews() {
-  document.getElementById('home-news').innerHTML = newsOrder.slice(0,3).map(n => `
-    <div style="padding:7px 10px;background:var(--bg);border-radius:8px;margin-bottom:5px;font-size:12px">
-      <span style="font-weight:700">${esc(n.title)}</span>
-      <p style="font-size:11px;color:var(--text-l);margin-top:2px;line-height:1.4">${esc(n.summary)}</p>
-    </div>`).join('');
+async function fetchDailyQuote() {
+  const skelEl   = document.getElementById('daily-quote-skeleton');
+  const textEl   = document.getElementById('daily-quote-text');
+  const authorEl = document.getElementById('daily-quote-author');
+
+  try {
+    // ZenQuotes requires a server-side call due to CORS on direct browser fetch.
+    // We use allorigins.win as a free no-signup CORS proxy.
+    const res  = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent('https://zenquotes.io/api/random'));
+    const data = await res.json();
+    const arr  = JSON.parse(data.contents);
+    const q    = arr[0];
+
+    skelEl.style.display  = 'none';
+    textEl.textContent    = `"${q.q}"`;
+    textEl.style.display  = 'block';
+    authorEl.textContent  = `— ${q.a}`;
+    authorEl.style.display = 'block';
+  } catch {
+    // Fallback: deterministic local quote by day-of-year
+    const doy = Math.floor((new Date() - new Date(new Date().getFullYear(),0,0)) / 864e5);
+    const q   = QUOTES[doy % QUOTES.length];
+    skelEl.style.display  = 'none';
+    textEl.textContent    = `"${q.t}"`;
+    textEl.style.display  = 'block';
+    authorEl.textContent  = q.c;
+    authorEl.style.display = 'block';
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// LIVE NEWS — rss2json.com (free, no-signup, CORS-OK)
+// ═══════════════════════════════════════════════════════
+const RSS2JSON = 'https://api.rss2json.com/v1/api.json?rss_url=';
+
+const NEWS_FEEDS = {
+  neetpg:   'https://news.google.com/rss/search?q=NEET+PG+2026+medical+India&hl=en-IN&gl=IN&ceid=IN:en',
+  clinical: 'https://www.medscape.com/cx/rssfeeds/2700.xml',
+  india:    'https://medicaldialogues.in/feed',
+};
+
+function skeletons(n) {
+  return Array(n).fill('<div class="skeleton"></div>').join('');
+}
+
+function relativeTime(dateStr) {
+  if (!dateStr) return '';
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const h = Math.floor(diff / 36e5);
+  if (h < 1)  return 'Just now';
+  if (h < 24) return `${h}h ago`;
+  const d = Math.floor(h / 24);
+  if (d < 7)  return `${d}d ago`;
+  return new Date(dateStr).toLocaleDateString('en-IN', {day:'numeric', month:'short'});
+}
+
+function renderNewsCards(containerId, items, sourceName, accentColor) {
+  const el = document.getElementById(containerId);
+  if (!items || !items.length) {
+    el.innerHTML = `<p style="font-size:12px;color:var(--text-m);padding:6px 0">No articles available right now. Try refreshing.</p>`;
+    return;
+  }
+  el.innerHTML = items.slice(0, 5).map(item => `
+    <a class="news-card" href="${esc(item.link)}" target="_blank" rel="noopener noreferrer">
+      <div class="news-card-source" style="color:${accentColor}">${esc(sourceName)}</div>
+      <div class="news-card-title">${esc(item.title)}</div>
+      <div class="news-card-date">${relativeTime(item.pubDate)}</div>
+    </a>`).join('');
+}
+
+async function fetchFeed(feedKey) {
+  const url = RSS2JSON + encodeURIComponent(NEWS_FEEDS[feedKey]);
+  const res = await fetch(url);
+  const data = await res.json();
+  if (data.status !== 'ok') throw new Error('Feed error');
+  return data.items;
+}
+
+// Home tab: show top 3 NEET PG items, fallback to static
+async function fetchHomeNews() {
+  const el = document.getElementById('home-news');
+  el.innerHTML = skeletons(3);
+  try {
+    const items = await fetchFeed('neetpg');
+    if (!items || !items.length) throw new Error('empty');
+    el.innerHTML = items.slice(0, 3).map(item => `
+      <a href="${esc(item.link)}" target="_blank" rel="noopener noreferrer"
+         style="display:block;text-decoration:none;color:inherit">
+        <div style="padding:7px 10px;background:var(--bg);border-radius:8px;margin-bottom:5px">
+          <span style="font-weight:700;font-size:12px">${esc(item.title)}</span>
+          <p style="font-size:10px;color:var(--text-m);margin-top:2px">${relativeTime(item.pubDate)}</p>
+        </div>
+      </a>`).join('');
+  } catch {
+    // Fallback to static items
+    el.innerHTML = FALLBACK_NEWS.slice(0, 3).map(n => `
+      <div style="padding:7px 10px;background:var(--bg);border-radius:8px;margin-bottom:5px;font-size:12px">
+        <span style="font-weight:700">${esc(n.title)}</span>
+        <p style="font-size:11px;color:var(--text-l);margin-top:2px;line-height:1.4">${esc(n.summary)}</p>
+      </div>`).join('');
+  }
+}
+
+// News tab: fetch all 3 feeds in parallel
+async function fetchAllNews() {
+  const btn = document.getElementById('news-refresh-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Loading...'; }
+
+  document.getElementById('news-neetpg').innerHTML   = skeletons(4);
+  document.getElementById('news-clinical').innerHTML = skeletons(4);
+  document.getElementById('news-india').innerHTML    = skeletons(4);
+
+  const [neetpgRes, clinicalRes, indiaRes] = await Promise.allSettled([
+    fetchFeed('neetpg'),
+    fetchFeed('clinical'),
+    fetchFeed('india'),
+  ]);
+
+  renderNewsCards(
+    'news-neetpg',
+    neetpgRes.status === 'fulfilled' ? neetpgRes.value : null,
+    'Google News',
+    'var(--pri-dark)'
+  );
+  renderNewsCards(
+    'news-clinical',
+    clinicalRes.status === 'fulfilled' ? clinicalRes.value : null,
+    'Medscape',
+    '#6B4E8A'
+  );
+  renderNewsCards(
+    'news-india',
+    indiaRes.status === 'fulfilled' ? indiaRes.value : null,
+    'Medical Dialogues',
+    '#C06000'
+  );
+
+  if (btn) { btn.disabled = false; btn.textContent = 'Refresh 🔄'; }
+}
+
+function shuffleNews() {
+  newsOrder = [...FALLBACK_NEWS].sort(() => Math.random() - 0.5);
+  renderResourcesNews();
 }
 
 function renderResourcesNews() {
@@ -685,12 +897,6 @@ function renderResourcesNews() {
       <p style="font-size:12px;font-weight:700">📌 ${esc(n.title)}</p>
       <p style="font-size:11px;color:var(--text-l);margin-top:2px;line-height:1.4">${esc(n.summary)}</p>
     </div>`).join('');
-}
-
-function shuffleNews() {
-  newsOrder = [...FALLBACK_NEWS].sort(() => Math.random() - 0.5);
-  renderHomeNews();
-  renderResourcesNews();
 }
 
 // ═══════════════════════════════════════════════════════
