@@ -25,6 +25,7 @@
     --shadow: 0 2px 16px rgba(74,55,40,0.07);
     --shadow-h: 0 4px 24px rgba(74,55,40,0.12);
   }
+
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
     font-family: 'Nunito', sans-serif;
@@ -38,28 +39,43 @@
   input:focus { outline: none; }
   button { -webkit-tap-highlight-color: transparent; }
 
-  @keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
-  @keyframes float { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-5px); } }
-  @keyframes pulse { 0%,100% { transform:scale(1); } 50% { transform:scale(1.06); } }
-  @keyframes spin { from { transform:rotate(0); } to { transform:rotate(360deg); } }
-  @keyframes bkFlash { 0% { box-shadow: 0 0 0 0 rgba(255,179,102,.5); } 100% { box-shadow: 0 0 0 12px rgba(255,179,102,0); } }
-  @keyframes revealPop { from { transform:scale(.9); opacity:0; } to { transform:scale(1); opacity:1; } }
+  @keyframes fadeUp   { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes float    { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-5px); } }
+  @keyframes pulse    { 0%,100% { transform:scale(1); } 50% { transform:scale(1.06); } }
+  @keyframes spin     { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
+  @keyframes revealPop{ from { transform:scale(.9); opacity:0; } to { transform:scale(1); opacity:1; } }
   @keyframes spinBtnPulse { 0%,100% { box-shadow: 0 4px 20px rgba(232,160,191,.4); } 50% { box-shadow: 0 4px 30px rgba(201,177,255,.6); } }
 
   .fu { animation: fadeUp .4s ease-out both; }
   .fl { animation: float 3s ease-in-out infinite; }
 
-  #app { max-width: 480px; margin: 0 auto; min-height: 100vh; padding-bottom: 76px; position: relative; }
+  /* ── App shell ── */
+  #app {
+    max-width: 480px;
+    margin: 0 auto;
+    min-height: 100vh;
+    padding-bottom: 76px;
+    position: relative;
+  }
 
-  /* Loading Screen */
+  /* ── Loading ── */
   #loading {
     position: fixed; inset: 0; z-index: 999;
     background: var(--bg);
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
   }
-  #loading .spinner { width:40px; height:40px; border:3px solid rgba(232,160,191,.3); border-top-color:var(--pri); border-radius:50%; animation:spin .8s linear infinite; }
+  .spinner {
+    width: 40px; height: 40px;
+    border: 3px solid rgba(232,160,191,.3);
+    border-top-color: var(--pri);
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+  }
 
-  /* Bottom Nav */
+  /* ── Tab sections: hidden by default, shown by JS ── */
+  .tab-section { display: none; }
+
+  /* ── Bottom nav ── */
   #bottom-nav {
     position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
     width: 100%; max-width: 480px;
@@ -72,147 +88,87 @@
     background: none; border: none; cursor: pointer; padding: 5px 2px;
     font-family: 'Nunito', sans-serif;
   }
-  .nav-btn .nav-icon { font-size: 19px; transition: all .2s; }
+  .nav-btn .nav-icon  { font-size: 19px; transition: all .2s; filter: grayscale(.4) opacity(.7); }
   .nav-btn .nav-label { font-size: 9px; font-weight: 600; color: var(--text-m); transition: all .2s; }
-  .nav-btn .nav-dot { width:14px; height:2.5px; border-radius:2px; background:linear-gradient(90deg,var(--pri),var(--sec)); margin-top:1px; display:none; }
-  .nav-btn.active .nav-icon { transform: scale(1.12); }
+  .nav-btn .nav-dot   { width: 14px; height: 2.5px; border-radius: 2px; background: linear-gradient(90deg,var(--pri),var(--sec)); margin-top: 1px; display: none; }
+  .nav-btn.active .nav-icon  { transform: scale(1.12); filter: none; }
   .nav-btn.active .nav-label { font-weight: 800; color: var(--pri-dark); }
-  .nav-btn.active .nav-dot { display: block; }
+  .nav-btn.active .nav-dot   { display: block; }
 
-  /* Tabs */
-  .tab { display: none; }
-  .tab.active { display: block; }
+  /* ── Cards ── */
+  .card { background: var(--card); border-radius: 16px; box-shadow: var(--shadow); }
+  .card-hover { cursor: pointer; transition: box-shadow .2s, transform .2s; }
+  .card-hover:active { box-shadow: var(--shadow-h); transform: translateY(-1px); }
 
-  /* Cards */
-  .card {
-    background: var(--card); border-radius: 16px; box-shadow: var(--shadow);
-  }
-  .card-hover { cursor: pointer; transition: all .2s; }
-  .card-hover:hover { box-shadow: var(--shadow-h); transform: translateY(-2px); }
-
-  /* Buttons */
+  /* ── Buttons ── */
   .btn-primary {
     background: linear-gradient(135deg, var(--pri), var(--sec));
     color: #fff; border: none; border-radius: 24px; padding: 10px 22px;
     font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'Nunito', sans-serif;
-    transition: all .2s;
+    transition: opacity .2s;
   }
   .btn-primary:disabled { opacity: .6; cursor: not-allowed; }
-  .btn-secondary {
-    background: #fff; color: var(--text); border: 1.5px solid #e8ddd4;
-    border-radius: 24px; padding: 10px 22px; font-size: 14px; font-weight: 700;
-    cursor: pointer; font-family: 'Nunito', sans-serif; transition: all .2s;
-  }
 
-  /* Pill */
+  /* ── Filter pills ── */
   .pill {
     padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700;
     white-space: nowrap; border: 1.5px solid #e8ddd4; cursor: pointer;
     font-family: 'Nunito', sans-serif; background: #fff; color: var(--text-l); transition: all .2s;
   }
-  .pill.active {
-    background: linear-gradient(135deg, var(--pri), var(--sec));
-    color: #fff; border: none;
-  }
+  .pill.active { background: linear-gradient(135deg,var(--pri),var(--sec)); color: #fff; border-color: transparent; }
 
-  /* HOME tab */
+  /* ── HOME ── */
   #tab-home { padding: 20px 16px; }
-  .home-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
-  .streak-badge {
-    background: linear-gradient(135deg,#FFF3E0,#FFE0B2);
-    border-radius: 14px; padding: 8px 12px; text-align: center;
-  }
-  .countdown-card { background:linear-gradient(135deg,#FFF0F5,#F0E6FF,#FFF3E0); padding: 20px; margin-bottom: 14px; }
-  .countdown-grid { display: flex; gap: 8px; }
-  .countdown-unit { flex:1; background:#fff; border-radius:12px; padding:10px 4px; text-align:center; }
-  .countdown-val { font-size:22px; font-weight:800; font-family:'Playfair Display',serif; }
-  .countdown-lbl { font-size:9px; color:var(--text-m); font-weight:700; margin-top:1px; }
+  .countdown-unit { flex: 1; background: #fff; border-radius: 12px; padding: 10px 4px; text-align: center; }
+  .countdown-val   { font-size: 22px; font-weight: 800; font-family: 'Playfair Display', serif; }
+  .countdown-lbl   { font-size: 9px; color: var(--text-m); font-weight: 700; margin-top: 1px; }
   .quick-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .quick-card { padding: 14px; border-radius: 16px; }
+  .quick-card { padding: 14px; border-radius: 16px; cursor: pointer; }
 
-  /* STUDY AI tab */
-  #tab-study { display: flex; flex-direction: column; height: calc(100vh - 76px); }
-  #tab-study.active { display: flex; }
-  .study-header {
-    padding: 12px 16px 10px;
-    background: linear-gradient(135deg,#FFF0F5,#F0E6FF);
-    border-bottom: 1px solid #f0e4f4;
-    display: flex; justify-content: space-between; align-items: center;
-    flex-shrink: 0;
-  }
-  .chat-messages { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
-  .chat-input-bar {
-    padding: 10px 14px; border-top: 1px solid #f0e4f4;
-    background: #fff; display: flex; gap: 8px; flex-shrink: 0;
-  }
-  .chat-input-bar input {
-    flex: 1; padding: 10px 14px; border-radius: 22px; border: 2px solid #f0e4f4;
-    font-size: 14px; font-family: 'Nunito', sans-serif; background: var(--bg); transition: border-color .2s;
-  }
-  .chat-input-bar input:focus { border-color: var(--pri); }
-  .msg-bubble { max-width: 85%; padding: 10px 14px; font-size: 13px; line-height: 1.6; box-shadow: var(--shadow); white-space: pre-wrap; }
-  .msg-user { border-radius: 16px 16px 4px 16px; background: linear-gradient(135deg,var(--pri),var(--sec)); color: #fff; align-self: flex-end; }
-  .msg-ai { border-radius: 16px 16px 16px 4px; background: #fff; color: var(--text); }
-  .typing-dots { display: flex; gap: 5px; padding: 10px 14px; background: #fff; border-radius: 14px; width: fit-content; box-shadow: var(--shadow); }
-  .typing-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--pri); }
-  .bookmarks-panel { padding: 12px; background: #FFFDF5; border-bottom: 1px solid #f0e4f4; max-height: 220px; overflow-y: auto; flex-shrink: 0; }
-  .quick-prompts { padding: 16px; overflow-y: auto; flex-shrink: 0; }
-  .prompt-chip { padding: 10px 12px; background: #fff; border-radius: 10px; font-size: 13px; cursor: pointer; box-shadow: var(--shadow); margin-bottom: 8px; border: 1px solid #f5e6f0; }
-
-  /* PLANNER tab */
+  /* ── PLANNER ── */
   #tab-planner { padding: 20px 16px; }
+  .filter-row  { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 14px; }
   .subject-card { padding: 12px 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
-  .filter-row { display: flex; gap: 6px; margin-bottom: 14px; overflow-x: auto; padding-bottom: 4px; }
 
-  /* Modal */
-  .modal-overlay {
-    position: fixed; inset: 0; z-index: 100;
-    display: flex; align-items: center; justify-content: center; padding: 16px;
-  }
+  /* ── Modal ── */
+  .modal-overlay  { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; padding: 16px; }
   .modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,.3); backdrop-filter: blur(4px); }
-  .modal-content {
+  .modal-content  {
     background: #fff; border-radius: 20px; padding: 22px;
     max-width: 400px; width: 100%; position: relative;
-    max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,.15);
-    z-index: 1;
+    max-height: 80vh; overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,.15); z-index: 1;
   }
   .modal-close { position: absolute; top: 12px; right: 14px; background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-m); }
   .topic-tag { padding: 3px 9px; border-radius: 7px; font-size: 11px; font-weight: 600; display: inline-block; margin: 2px; }
 
-  /* MOTIVATE tab */
-  #tab-motivate { padding: 20px 16px; display: flex; flex-direction: column; min-height: calc(100vh - 76px); }
-  #tab-motivate.active { display: flex; }
+  /* ── MOTIVATE ── */
+  #tab-motivate { padding: 20px 16px; display: flex; flex-direction: column; align-items: center; }
   .wheel-wrapper { position: relative; width: 260px; height: 260px; margin: 0 auto 24px; }
-  .wheel-pointer { position: absolute; top: -8px; left: 50%; transform: translateX(-50%); z-index: 2; font-size: 28px; color: var(--pri-dark); filter: drop-shadow(0 2px 4px rgba(0,0,0,.2)); }
-  #wheel-svg { filter: drop-shadow(0 4px 12px rgba(0,0,0,.1)); }
+  .wheel-pointer { position: absolute; top: -8px; left: 50%; transform: translateX(-50%); z-index: 2; font-size: 28px; color: var(--pri-dark); filter: drop-shadow(0 2px 4px rgba(0,0,0,.2)); line-height: 1; }
   .spin-btn {
     background: linear-gradient(135deg,var(--pri),var(--sec),var(--accent));
     color: #fff; border: none; border-radius: 30px; padding: 14px 48px;
     font-size: 18px; font-weight: 900; cursor: pointer; font-family: 'Nunito', sans-serif;
     letter-spacing: 1px; text-transform: uppercase;
     animation: spinBtnPulse 2s ease-in-out infinite;
-    transition: all .3s; margin-bottom: 20px;
+    transition: background .3s; margin-bottom: 20px;
   }
   .spin-btn:disabled { background: linear-gradient(135deg,#ccc,#ddd); cursor: not-allowed; animation: none; }
   .spin-quote-card {
     background: linear-gradient(135deg,#FFF0F5,#F0E6FF);
-    border-radius: 16px; padding: 18px; text-align: center; width: 100%; max-width: 360px;
+    border-radius: 16px; padding: 18px; text-align: center;
+    width: 100%; max-width: 360px;
     animation: revealPop .4s ease-out both;
   }
 
-  /* RESOURCES tab */
+  /* ── RESOURCES ── */
   #tab-resources { padding: 20px 16px; }
-  .resource-card { padding: 12px 14px; display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; display: block; margin-bottom: 8px; }
-
-  /* Journey staircase */
-  .journey-card { padding: 18px 16px; margin-bottom: 14px; background: linear-gradient(135deg,#FCE4EC,#F3E5F5,#E8EAF6); }
-  .staircase { display: flex; align-items: flex-end; justify-content: center; gap: 0; height: 140px; padding: 0 8px; }
-  .stair-step { display: flex; flex-direction: column; align-items: center; flex: 1; }
-  .stair-block { width: 100%; border-radius: 10px 10px 0 0; display: flex; flex-direction: column; justify-content: center; align-items: center; }
 </style>
 </head>
 <body>
 
+<!-- Loading screen -->
 <div id="loading">
   <div class="fl" style="font-size:48px">🩺</div>
   <p style="font-family:'Playfair Display',serif;font-size:20px;color:var(--text)">Loading PG Buddy...</p>
@@ -221,15 +177,16 @@
 
 <div id="app" style="display:none">
 
-  <!-- HOME -->
-  <div id="tab-home" class="tab fu">
-    <div class="home-header">
+  <!-- ═══ HOME ═══ -->
+  <div id="tab-home" class="tab-section fu">
+    <!-- Header row -->
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px">
       <div>
         <p id="greeting-text" style="font-size:13px;color:var(--text-l)"></p>
         <h1 style="font-family:'Playfair Display',serif;font-size:26px;color:var(--text)">Dr. Sufia ✨</h1>
         <p style="font-size:12px;color:var(--text-m);margin-top:2px">NEET PG 2026 Aspirant</p>
       </div>
-      <div id="streak-badge" class="streak-badge" style="display:none">
+      <div id="streak-badge" style="display:none;background:linear-gradient(135deg,#FFF3E0,#FFE0B2);border-radius:14px;padding:8px 12px;text-align:center">
         <div style="font-size:20px">🔥</div>
         <div id="streak-num" style="font-size:16px;font-weight:900;color:#E65100"></div>
         <div style="font-size:9px;color:#BF360C;font-weight:700">day streak</div>
@@ -237,9 +194,9 @@
     </div>
 
     <!-- Countdown -->
-    <div class="card countdown-card" style="margin-bottom:14px">
+    <div class="card" style="background:linear-gradient(135deg,#FFF0F5,#F0E6FF,#FFF3E0);padding:20px;margin-bottom:14px">
       <p style="font-size:11px;font-weight:700;color:var(--pri-dark);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">⏰ Countdown to NEET PG</p>
-      <div class="countdown-grid">
+      <div style="display:flex;gap:8px">
         <div class="countdown-unit"><div id="cd-days" class="countdown-val">00</div><div class="countdown-lbl">Days</div></div>
         <div class="countdown-unit"><div id="cd-hours" class="countdown-val">00</div><div class="countdown-lbl">Hours</div></div>
         <div class="countdown-unit"><div id="cd-mins" class="countdown-val">00</div><div class="countdown-lbl">Mins</div></div>
@@ -248,64 +205,64 @@
       <p style="font-size:11px;color:var(--text-l);text-align:center;margin-top:10px">📅 Expected: August 11, 2026</p>
     </div>
 
-    <!-- Journey Staircase -->
-    <div class="card journey-card">
+    <!-- Journey staircase -->
+    <div class="card" style="padding:18px 16px;margin-bottom:14px;background:linear-gradient(135deg,#FCE4EC,#F3E5F5,#E8EAF6)">
       <p style="font-size:10px;font-weight:700;color:var(--pri-dark);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;text-align:center">🏆 Your Journey</p>
-      <div class="staircase">
-        <div class="stair-step">
+      <div style="display:flex;align-items:flex-end;justify-content:center;height:140px;padding:0 8px">
+        <div style="display:flex;flex-direction:column;align-items:center;flex:1">
           <div class="fl" style="font-size:24px;margin-bottom:6px;animation-delay:0s">🎓</div>
-          <div class="stair-block" style="height:35px;background:linear-gradient(180deg,#E8A0BF,#E8A0BFdd)">
+          <div style="width:100%;height:35px;background:linear-gradient(180deg,#E8A0BF,#E8A0BFdd);border-radius:10px 10px 0 0;display:flex;flex-direction:column;justify-content:center;align-items:center">
             <span style="font-size:11px;font-weight:800;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.2)">MBBS</span>
-            <span style="font-size:8px;font-weight:600;color:rgba(255,255,255,.85);margin-top:1px">Ukraine</span>
+            <span style="font-size:8px;font-weight:600;color:rgba(255,255,255,.85)">Ukraine</span>
           </div>
         </div>
-        <div class="stair-step">
+        <div style="display:flex;flex-direction:column;align-items:center;flex:1">
           <div class="fl" style="font-size:24px;margin-bottom:6px;animation-delay:.2s">✅</div>
-          <div class="stair-block" style="height:60px;background:linear-gradient(180deg,#C9B1FF,#C9B1FFdd)">
+          <div style="width:100%;height:60px;background:linear-gradient(180deg,#C9B1FF,#C9B1FFdd);border-radius:10px 10px 0 0;display:flex;flex-direction:column;justify-content:center;align-items:center">
             <span style="font-size:11px;font-weight:800;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.2)">FMGE</span>
-            <span style="font-size:8px;font-weight:600;color:rgba(255,255,255,.85);margin-top:1px">1st Attempt</span>
+            <span style="font-size:8px;font-weight:600;color:rgba(255,255,255,.85)">1st Attempt</span>
           </div>
         </div>
-        <div class="stair-step">
+        <div style="display:flex;flex-direction:column;align-items:center;flex:1">
           <div class="fl" style="font-size:24px;margin-bottom:6px;animation-delay:.4s">🏥</div>
-          <div class="stair-block" style="height:85px;background:linear-gradient(180deg,#FFB366,#FFB366dd)">
+          <div style="width:100%;height:85px;background:linear-gradient(180deg,#FFB366,#FFB366dd);border-radius:10px 10px 0 0;display:flex;flex-direction:column;justify-content:center;align-items:center">
             <span style="font-size:11px;font-weight:800;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.2)">Internship</span>
-            <span style="font-size:8px;font-weight:600;color:rgba(255,255,255,.85);margin-top:1px">Completed</span>
+            <span style="font-size:8px;font-weight:600;color:rgba(255,255,255,.85)">Completed</span>
           </div>
         </div>
-        <div class="stair-step">
+        <div style="display:flex;flex-direction:column;align-items:center;flex:1">
           <div class="fl" style="font-size:24px;margin-bottom:6px;animation-delay:.6s">🎯</div>
-          <div class="stair-block" style="height:115px;background:linear-gradient(180deg,#A8E6CF,#A8E6CFdd);box-shadow:0 0 16px rgba(168,230,207,.4);border:2px dashed #66BB6A">
+          <div style="width:100%;height:115px;background:linear-gradient(180deg,#A8E6CF,#A8E6CFdd);border-radius:10px 10px 0 0;display:flex;flex-direction:column;justify-content:center;align-items:center;box-shadow:0 0 16px rgba(168,230,207,.4);border:2px dashed #66BB6A">
             <span style="font-size:11px;font-weight:800;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.2)">NEET PG</span>
-            <span style="font-size:8px;font-weight:600;color:rgba(255,255,255,.85);margin-top:1px">Next →</span>
+            <span style="font-size:8px;font-weight:600;color:rgba(255,255,255,.85)">Next →</span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Daily Quote -->
-    <div id="daily-quote-card" class="card" style="padding:14px;margin-bottom:14px;border-left:4px solid var(--pri);display:none">
+    <!-- Daily quote -->
+    <div id="daily-quote-card" class="card" style="display:none;padding:14px;margin-bottom:14px;border-left:4px solid var(--pri)">
       <p style="font-size:10px;font-weight:700;color:var(--pri);margin-bottom:4px">💭 TODAY'S MOTIVATION</p>
       <p id="daily-quote-text" style="font-size:13px;line-height:1.6;font-style:italic"></p>
       <p id="daily-quote-cat" style="font-size:10px;color:var(--text-m);margin-top:4px"></p>
     </div>
 
-    <!-- Study Progress -->
+    <!-- Study progress -->
     <div class="card" style="padding:14px;margin-bottom:14px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
         <span style="font-size:12px;font-weight:700;color:var(--pri-dark)">📖 Study Progress</span>
-        <span id="progress-label" style="font-size:14px;font-weight:900;color:var(--pri-dark)">0/19</span>
+        <span id="home-progress-label" style="font-size:14px;font-weight:900;color:var(--pri-dark)">0/19</span>
       </div>
       <div style="height:10px;background:#f5f0eb;border-radius:6px;overflow:hidden">
         <div style="display:flex;height:100%">
-          <div id="progress-done-bar" style="width:0%;background:linear-gradient(90deg,var(--mint),#66BB6A);transition:width .5s"></div>
-          <div id="progress-ip-bar" style="width:0%;background:linear-gradient(90deg,#FFD54F,#FFB300);transition:width .5s"></div>
+          <div id="home-done-bar" style="width:0%;background:linear-gradient(90deg,var(--mint),#66BB6A);transition:width .5s"></div>
+          <div id="home-ip-bar"   style="width:0%;background:linear-gradient(90deg,#FFD54F,#FFB300);transition:width .5s"></div>
         </div>
       </div>
       <div style="display:flex;gap:12px;margin-top:6px">
-        <span id="prog-done" style="font-size:10px;color:var(--text-m)">✅ 0</span>
-        <span id="prog-ip" style="font-size:10px;color:var(--text-m)">🟡 0</span>
-        <span id="prog-ns" style="font-size:10px;color:var(--text-m)">⬜ 19</span>
+        <span id="home-done-ct" style="font-size:10px;color:var(--text-m)">✅ 0</span>
+        <span id="home-ip-ct"   style="font-size:10px;color:var(--text-m)">🟡 0</span>
+        <span id="home-ns-ct"   style="font-size:10px;color:var(--text-m)">⬜ 19</span>
       </div>
     </div>
 
@@ -315,14 +272,9 @@
       <div id="home-news"></div>
     </div>
 
-    <!-- Quick Access -->
+    <!-- Quick access — 3 cards (no Study AI) -->
     <p style="font-size:11px;font-weight:700;color:var(--text-l);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Quick Access</p>
-    <div class="quick-grid">
-      <div class="card card-hover quick-card" style="background:linear-gradient(135deg,#FFE4E6,#FFF0F5)" onclick="switchTab('study')">
-        <div style="font-size:26px;margin-bottom:6px">🤖</div>
-        <div style="font-weight:700;font-size:13px">Study AI</div>
-        <div id="qa-study-desc" style="font-size:11px;color:var(--text-l);margin-top:2px">Ask anything</div>
-      </div>
+    <div class="quick-grid" style="grid-template-columns:1fr 1fr 1fr">
       <div class="card card-hover quick-card" style="background:linear-gradient(135deg,#EDE7F6,#F3E5F5)" onclick="switchTab('planner')">
         <div style="font-size:26px;margin-bottom:6px">📋</div>
         <div style="font-weight:700;font-size:13px">Planner</div>
@@ -341,47 +293,12 @@
     </div>
   </div>
 
-  <!-- STUDY AI -->
-  <div id="tab-study" class="tab">
-    <div class="study-header">
-      <div>
-        <h2 style="font-family:'Playfair Display',serif;font-size:18px;margin:0">🤖 Study Strategist</h2>
-        <p style="font-size:11px;color:var(--text-l);margin-top:2px">Your NEET PG AI mentor</p>
-      </div>
-      <div style="display:flex;gap:6px">
-        <button id="bk-toggle-btn" onclick="toggleBookmarksPanel()" style="background:#fff;color:var(--text);border:1px solid #e8ddd4;border-radius:10px;padding:5px 10px;font-size:12px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700">⭐ <span id="bk-count">0</span></button>
-        <button id="clear-chat-btn" onclick="clearChat()" style="display:none;background:#fff;border:1px solid #e8ddd4;border-radius:10px;padding:5px 10px;font-size:12px;cursor:pointer;font-family:'Nunito',sans-serif;color:var(--text-l)">🗑️</button>
-      </div>
-    </div>
-
-    <div id="bookmarks-panel" class="bookmarks-panel" style="display:none">
-      <p style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:8px">⭐ Saved Tips (<span id="bk-panel-count">0</span>)</p>
-      <div id="bookmarks-list"></div>
-    </div>
-
-    <div id="quick-prompts" class="quick-prompts">
-      <p style="font-size:11px;font-weight:700;color:var(--text-m);margin-bottom:10px">💬 Tap to ask:</p>
-      <div class="prompt-chip" onclick="sendChat('How should I start my NEET PG preparation?')">💬 How should I start my NEET PG preparation?</div>
-      <div class="prompt-chip" onclick="sendChat('Top 5 high-yield topics in Pharmacology')">💬 Top 5 high-yield topics in Pharmacology</div>
-      <div class="prompt-chip" onclick="sendChat('Make me a 6-month study timetable')">💬 Make me a 6-month study timetable</div>
-      <div class="prompt-chip" onclick="sendChat('I\'m struggling with Biochemistry — help me plan')">💬 I'm struggling with Biochemistry — help me plan</div>
-      <div class="prompt-chip" onclick="sendChat('Best strategy for last 3 months revision?')">💬 Best strategy for last 3 months revision?</div>
-      <div class="prompt-chip" onclick="sendChat('How to stay consistent with daily study hours?')">💬 How to stay consistent with daily study hours?</div>
-    </div>
-
-    <div id="chat-messages" class="chat-messages"></div>
-
-    <div class="chat-input-bar">
-      <input id="chat-input" type="text" placeholder="Ask about any subject, topic, strategy..." onkeydown="if(event.key==='Enter')sendChat()">
-      <button class="btn-primary" id="send-btn" onclick="sendChat()" style="padding:10px 16px">Send</button>
-    </div>
-  </div>
-
-  <!-- PLANNER -->
-  <div id="tab-planner" class="tab fu" style="padding:20px 16px">
+  <!-- ═══ PLANNER ═══ -->
+  <div id="tab-planner" class="tab-section fu" style="padding:20px 16px">
     <h2 style="font-family:'Playfair Display',serif;font-size:20px;margin-bottom:2px">📋 Subject Planner</h2>
     <p style="font-size:12px;color:var(--text-l);margin-bottom:12px">Track progress across all 19 subjects</p>
 
+    <!-- Overall progress -->
     <div class="card" style="padding:14px;margin-bottom:14px;background:linear-gradient(135deg,#FFF0F5,#F0E6FF)">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
         <span style="font-size:12px;font-weight:700;color:var(--pri-dark)">Overall Progress</span>
@@ -390,59 +307,61 @@
       <div style="height:10px;background:#fff;border-radius:6px;overflow:hidden">
         <div style="display:flex;height:100%">
           <div id="planner-done-bar" style="width:0%;background:linear-gradient(90deg,var(--mint),#66BB6A);transition:width .5s"></div>
-          <div id="planner-ip-bar" style="width:0%;background:linear-gradient(90deg,#FFD54F,#FFB300);transition:width .5s"></div>
+          <div id="planner-ip-bar"   style="width:0%;background:linear-gradient(90deg,#FFD54F,#FFB300);transition:width .5s"></div>
         </div>
       </div>
       <div style="display:flex;gap:12px;margin-top:6px">
         <span id="planner-done-ct" style="font-size:10px;color:var(--text-m)">✅ 0</span>
-        <span id="planner-ip-ct" style="font-size:10px;color:var(--text-m)">🟡 0</span>
-        <span id="planner-ns-ct" style="font-size:10px;color:var(--text-m)">⬜ 19</span>
+        <span id="planner-ip-ct"   style="font-size:10px;color:var(--text-m)">🟡 0</span>
+        <span id="planner-ns-ct"   style="font-size:10px;color:var(--text-m)">⬜ 19</span>
       </div>
     </div>
 
-    <div class="filter-row" id="filter-pills">
-      <button class="pill active" data-filter="all" onclick="setFilter(this,'all')">All (19)</button>
-      <button class="pill" data-filter="high" onclick="setFilter(this,'high')">🔴 High</button>
-      <button class="pill" data-filter="medium" onclick="setFilter(this,'medium')">🟡 Medium</button>
-      <button class="pill" data-filter="quick" onclick="setFilter(this,'quick')">🟢 Quick</button>
+    <!-- Filter pills -->
+    <div class="filter-row">
+      <button class="pill active" onclick="setFilter(this,'all')">All (19)</button>
+      <button class="pill" onclick="setFilter(this,'high')">🔴 High</button>
+      <button class="pill" onclick="setFilter(this,'medium')">🟡 Medium</button>
+      <button class="pill" onclick="setFilter(this,'quick')">🟢 Quick</button>
     </div>
 
+    <!-- Subject list -->
     <div id="subjects-list"></div>
 
-    <!-- Weightage Chart -->
+    <!-- Weightage chart -->
     <div class="card" style="margin-top:14px;padding:14px">
       <p style="font-size:11px;font-weight:700;color:var(--text-l);margin-bottom:10px">📊 WEIGHTAGE OVERVIEW</p>
       <div id="weightage-chart"></div>
     </div>
   </div>
 
-  <!-- Subject Modal -->
+  <!-- Subject modal (outside tab sections — always in DOM) -->
   <div id="subject-modal" class="modal-overlay" style="display:none">
     <div class="modal-backdrop" onclick="closeModal()"></div>
-    <div class="modal-content" onclick="event.stopPropagation()">
+    <div class="modal-content">
       <button class="modal-close" onclick="closeModal()">✕</button>
       <div id="modal-body"></div>
     </div>
   </div>
 
-  <!-- MOTIVATE -->
-  <div id="tab-motivate" class="tab fu" style="text-align:center">
-    <div style="padding:20px 16px 0">
-      <h2 style="font-family:'Playfair Display',serif;font-size:20px;margin-bottom:2px">✨ Motivation Zone</h2>
+  <!-- ═══ MOTIVATE ═══ -->
+  <div id="tab-motivate" class="tab-section fu">
+    <div style="text-align:center;padding:20px 16px 0">
+      <h2 style="font-family:'Playfair Display',serif;font-size:20px;margin-bottom:4px">✨ Motivation Zone</h2>
       <p style="font-size:12px;color:var(--text-l);margin-bottom:20px">Spin the wheel for a boost!</p>
     </div>
     <div class="card" style="padding:24px;margin:0 16px;display:flex;flex-direction:column;align-items:center">
       <div class="wheel-wrapper">
         <div class="wheel-pointer">▼</div>
-        <svg id="wheel-svg" width="260" height="260" viewBox="0 0 260 260"></svg>
+        <svg id="wheel-svg" width="260" height="260" viewBox="0 0 260 260" style="filter:drop-shadow(0 4px 12px rgba(0,0,0,.1))"></svg>
       </div>
       <button id="spin-btn" class="spin-btn" onclick="spinWheel()">🎡 Spin</button>
       <div id="spin-quote" class="spin-quote-card" style="display:none"></div>
     </div>
   </div>
 
-  <!-- RESOURCES -->
-  <div id="tab-resources" class="tab fu" style="padding:20px 16px">
+  <!-- ═══ RESOURCES ═══ -->
+  <div id="tab-resources" class="tab-section fu" style="padding:20px 16px">
     <h2 style="font-family:'Playfair Display',serif;font-size:20px;margin-bottom:2px">📚 Resources & Links</h2>
     <p style="font-size:12px;color:var(--text-l);margin-bottom:16px">Curated tools for your NEET PG prep</p>
     <div id="resources-list"></div>
@@ -465,18 +384,13 @@
     </div>
   </div>
 
-</div>
+</div><!-- /#app -->
 
-<!-- Bottom Nav -->
-<nav id="bottom-nav">
-  <button class="nav-btn active" data-tab="home" onclick="switchTab('home')">
+<!-- ═══ BOTTOM NAV — 4 tabs, no Study AI ═══ -->
+<nav id="bottom-nav" style="display:none">
+  <button class="nav-btn" data-tab="home" onclick="switchTab('home')">
     <span class="nav-icon">🏠</span>
     <span class="nav-label">Home</span>
-    <div class="nav-dot"></div>
-  </button>
-  <button class="nav-btn" data-tab="study" onclick="switchTab('study')">
-    <span class="nav-icon">🤖</span>
-    <span class="nav-label">Study AI</span>
     <div class="nav-dot"></div>
   </button>
   <button class="nav-btn" data-tab="planner" onclick="switchTab('planner')">
@@ -498,44 +412,42 @@
 
 <script>
 // ═══════════════════════════════════════════════════════
-// DATA CONSTANTS
+// DATA
 // ═══════════════════════════════════════════════════════
-
 const EXAM_DATE = new Date("2026-08-11T00:00:00");
 
 const KEYS = {
-  subjects: "pgbuddy-subjects",
-  chat: "pgbuddy-chat",
+  subjects:  "pgbuddy-subjects",
   bookmarks: "pgbuddy-bookmarks",
-  streak: "pgbuddy-streak"
+  streak:    "pgbuddy-streak"
 };
 
 const SUBJECTS = [
-  { id:"medicine",name:"Medicine",w:8,d:5,tier:"high",color:"#FFFFBA",emoji:"🩺",topics:["Cardiology","Nephrology","Endocrinology","Neurology","Gastroenterology","Pulmonology","Rheumatology"],tip:"Largest subject — start early. Clinical scenarios dominate NEET PG. Integrate with Pathology." },
-  { id:"pharmacology",name:"Pharmacology",w:7.5,d:4,tier:"high",color:"#FFB3BA",emoji:"💊",topics:["ANS Drugs","CVS Pharmacology","Antimicrobials","CNS Drugs","Chemotherapy","Autacoids","Endocrine Pharma"],tip:"Tables are your best friend. Focus on drug classification, MOA, side effects." },
-  { id:"pathology",name:"Pathology",w:7.5,d:4,tier:"high",color:"#FFDFBA",emoji:"🔬",topics:["Hematology","Neoplasia","Immunopathology","Genetic Disorders","Cell Injury","Inflammation","Hemodynamics"],tip:"The bridge subject — connects everything. Learn mechanisms here, apply in Medicine & Surgery." },
-  { id:"surgery",name:"Surgery",w:6,d:4,tier:"high",color:"#BAFFC9",emoji:"🔪",topics:["GI Surgery","Urology","Surgical Oncology","Trauma","Breast","Thyroid & Endocrine","Vascular"],tip:"Classical presentations, investigation of choice, and treatment protocols are key." },
-  { id:"obg",name:"OBG",w:6,d:4,tier:"high",color:"#BAE1FF",emoji:"🤰",topics:["High Risk Pregnancy","Labour","Contraception","Gynec Oncology","Infertility","Menstrual Disorders","USG"],tip:"Obstetrics is predictable. Contraception questions repeat yearly." },
-  { id:"psm",name:"PSM / Community Med",w:6,d:3,tier:"high",color:"#E8BAFF",emoji:"📊",topics:["Epidemiology","Biostatistics","National Health Programs","Nutrition","Environment","Demography","Healthcare Mgmt"],tip:"Memorization goldmine. Flashcards for national programs. Very scoring." },
-  { id:"microbiology",name:"Microbiology",w:5,d:3,tier:"medium",color:"#FFD1DC",emoji:"🦠",topics:["Bacteriology","Virology","Mycology","Parasitology","Immunology","Lab Diagnosis","Vaccines"],tip:"Tables for organisms, culture media, stains. Vaccine schedule is must-know." },
-  { id:"pediatrics",name:"Pediatrics",w:4,d:3,tier:"medium",color:"#C7CEEA",emoji:"👶",topics:["Neonatology","Growth & Development","Nutrition","Immunization","Genetic Disorders","Emergencies","Infections"],tip:"Immunization schedule and milestones asked every year. Neonatology is highest-yield." },
-  { id:"anatomy",name:"Anatomy",w:3.5,d:3,tier:"medium",color:"#C9FFE5",emoji:"🦴",topics:["Upper Limb","Lower Limb","Thorax","Abdomen","Head & Neck","Neuroanatomy","Embryology"],tip:"Neuroanatomy and Embryology are disproportionately high-yield." },
-  { id:"physiology",name:"Physiology",w:3.5,d:3,tier:"medium",color:"#D5BAFF",emoji:"❤️",topics:["CVS","Renal","Respiratory","GIT","Neurophysiology","Endocrine","Blood & Immunity"],tip:"Graphs and mechanisms are favorites. CVS and Renal carry the most weight." },
-  { id:"biochemistry",name:"Biochemistry",w:3.5,d:4,tier:"medium",color:"#FFEEBA",emoji:"🧬",topics:["Enzyme Kinetics","Metabolism","Molecular Biology","Genetics","Nutrition Biochem","Clinical Biochem"],tip:"Metabolic pathways and enzyme deficiency diseases are classics." },
-  { id:"ophthalmology",name:"Ophthalmology",w:3.5,d:3,tier:"medium",color:"#B5EAD7",emoji:"👁️",topics:["Glaucoma","Retinal Disorders","Lens","Cornea","Neuro-ophthalmology","Squint","Refractive Errors"],tip:"Image-based questions very common. Glaucoma and retinal pathology most tested." },
-  { id:"ent",name:"ENT",w:3.5,d:3,tier:"medium",color:"#FFB7B2",emoji:"👂",topics:["Ear Disorders","Nose & PNS","Throat & Larynx","Head & Neck","Audiology","Otitis Media"],tip:"ENT + Ophthal = ~7% of exam. Very scoring short subjects." },
-  { id:"orthopedics",name:"Orthopedics",w:3,d:3,tier:"medium",color:"#FFDAC1",emoji:"🦿",topics:["Fractures","Bone Tumors","Joint Disorders","Spine","Pediatric Ortho","Sports Medicine"],tip:"Classic fracture patterns and named tests repeat every year." },
-  { id:"dermatology",name:"Dermatology",w:2.5,d:2,tier:"quick",color:"#FF9AA2",emoji:"🧴",topics:["Infections","Papulosquamous","Vesiculobullous","Connective Tissue","Pigmentary","STDs"],tip:"Maximum marks per hour. Image-heavy, pattern-based, very predictable." },
-  { id:"fmt",name:"Forensic Medicine",w:2.5,d:2,tier:"quick",color:"#E2F0CB",emoji:"⚖️",topics:["Thanatology","Toxicology","Assault & Injuries","Sexual Offences","Medical Jurisprudence","Identification"],tip:"Toxicology overlaps with Pharmacology. Low effort, reliable marks." },
-  { id:"psychiatry",name:"Psychiatry",w:2,d:2,tier:"quick",color:"#DCD3FF",emoji:"🧠",topics:["Mood Disorders","Schizophrenia","Anxiety Disorders","Substance Abuse","Child Psychiatry","Psychopharmacology"],tip:"DSM criteria and drug treatments. Small, predictable, easy 2%." },
-  { id:"anesthesia",name:"Anesthesia",w:2,d:2,tier:"quick",color:"#FFC8DD",emoji:"😷",topics:["General Anesthesia","Regional Blocks","Pain Management","ICU","Preoperative Assessment","Airway Mgmt"],tip:"Drug doses, types of anesthesia, ASA classification. Airway algorithms are high-yield." },
-  { id:"radiology",name:"Radiology",w:1.5,d:2,tier:"quick",color:"#BDE0FE",emoji:"📡",topics:["X-ray","CT Findings","MRI Basics","USG","Contrast Studies","Nuclear Medicine"],tip:"Learn 30-40 named radiological signs — guaranteed marks every year." },
+  {id:"medicine",    name:"Medicine",         w:8,   d:5, tier:"high",   color:"#FFFFBA", emoji:"🩺", topics:["Cardiology","Nephrology","Endocrinology","Neurology","Gastroenterology","Pulmonology","Rheumatology"],            tip:"Largest subject — start early. Clinical scenarios dominate NEET PG. Integrate with Pathology."},
+  {id:"pharmacology",name:"Pharmacology",     w:7.5, d:4, tier:"high",   color:"#FFB3BA", emoji:"💊", topics:["ANS Drugs","CVS Pharmacology","Antimicrobials","CNS Drugs","Chemotherapy","Autacoids","Endocrine Pharma"],        tip:"Tables are your best friend. Focus on drug classification, MOA, side effects."},
+  {id:"pathology",   name:"Pathology",        w:7.5, d:4, tier:"high",   color:"#FFDFBA", emoji:"🔬", topics:["Hematology","Neoplasia","Immunopathology","Genetic Disorders","Cell Injury","Inflammation","Hemodynamics"],      tip:"The bridge subject — connects everything. Learn mechanisms here, apply in Medicine & Surgery."},
+  {id:"surgery",     name:"Surgery",          w:6,   d:4, tier:"high",   color:"#BAFFC9", emoji:"🔪", topics:["GI Surgery","Urology","Surgical Oncology","Trauma","Breast","Thyroid & Endocrine","Vascular"],                   tip:"Classical presentations, investigation of choice, and treatment protocols are key."},
+  {id:"obg",         name:"OBG",              w:6,   d:4, tier:"high",   color:"#BAE1FF", emoji:"🤰", topics:["High Risk Pregnancy","Labour","Contraception","Gynec Oncology","Infertility","Menstrual Disorders","USG"],        tip:"Obstetrics is predictable. Contraception questions repeat yearly."},
+  {id:"psm",         name:"PSM / Community",  w:6,   d:3, tier:"high",   color:"#E8BAFF", emoji:"📊", topics:["Epidemiology","Biostatistics","National Health Programs","Nutrition","Environment","Demography","Healthcare Mgmt"],tip:"Memorization goldmine. Flashcards for national programs. Very scoring."},
+  {id:"microbiology",name:"Microbiology",     w:5,   d:3, tier:"medium", color:"#FFD1DC", emoji:"🦠", topics:["Bacteriology","Virology","Mycology","Parasitology","Immunology","Lab Diagnosis","Vaccines"],                     tip:"Tables for organisms, culture media, stains. Vaccine schedule is must-know."},
+  {id:"pediatrics",  name:"Pediatrics",       w:4,   d:3, tier:"medium", color:"#C7CEEA", emoji:"👶", topics:["Neonatology","Growth & Development","Nutrition","Immunization","Genetic Disorders","Emergencies","Infections"],   tip:"Immunization schedule and milestones asked every year. Neonatology is highest-yield."},
+  {id:"anatomy",     name:"Anatomy",          w:3.5, d:3, tier:"medium", color:"#C9FFE5", emoji:"🦴", topics:["Upper Limb","Lower Limb","Thorax","Abdomen","Head & Neck","Neuroanatomy","Embryology"],                          tip:"Neuroanatomy and Embryology are disproportionately high-yield."},
+  {id:"physiology",  name:"Physiology",       w:3.5, d:3, tier:"medium", color:"#D5BAFF", emoji:"❤️", topics:["CVS","Renal","Respiratory","GIT","Neurophysiology","Endocrine","Blood & Immunity"],                             tip:"Graphs and mechanisms are favorites. CVS and Renal carry the most weight."},
+  {id:"biochemistry",name:"Biochemistry",     w:3.5, d:4, tier:"medium", color:"#FFEEBA", emoji:"🧬", topics:["Enzyme Kinetics","Metabolism","Molecular Biology","Genetics","Nutrition Biochem","Clinical Biochem"],            tip:"Metabolic pathways and enzyme deficiency diseases are classics."},
+  {id:"ophthalmology",name:"Ophthalmology",   w:3.5, d:3, tier:"medium", color:"#B5EAD7", emoji:"👁️",topics:["Glaucoma","Retinal Disorders","Lens","Cornea","Neuro-ophthalmology","Squint","Refractive Errors"],               tip:"Image-based questions very common. Glaucoma and retinal pathology most tested."},
+  {id:"ent",         name:"ENT",              w:3.5, d:3, tier:"medium", color:"#FFB7B2", emoji:"👂", topics:["Ear Disorders","Nose & PNS","Throat & Larynx","Head & Neck","Audiology","Otitis Media"],                         tip:"ENT + Ophthal = ~7% of exam. Very scoring short subjects."},
+  {id:"orthopedics", name:"Orthopedics",      w:3,   d:3, tier:"medium", color:"#FFDAC1", emoji:"🦿", topics:["Fractures","Bone Tumors","Joint Disorders","Spine","Pediatric Ortho","Sports Medicine"],                         tip:"Classic fracture patterns and named tests repeat every year."},
+  {id:"dermatology", name:"Dermatology",      w:2.5, d:2, tier:"quick",  color:"#FF9AA2", emoji:"🧴", topics:["Infections","Papulosquamous","Vesiculobullous","Connective Tissue","Pigmentary","STDs"],                         tip:"Maximum marks per hour. Image-heavy, pattern-based, very predictable."},
+  {id:"fmt",         name:"Forensic Medicine",w:2.5, d:2, tier:"quick",  color:"#E2F0CB", emoji:"⚖️", topics:["Thanatology","Toxicology","Assault & Injuries","Sexual Offences","Medical Jurisprudence","Identification"],      tip:"Toxicology overlaps with Pharmacology. Low effort, reliable marks."},
+  {id:"psychiatry",  name:"Psychiatry",       w:2,   d:2, tier:"quick",  color:"#DCD3FF", emoji:"🧠", topics:["Mood Disorders","Schizophrenia","Anxiety Disorders","Substance Abuse","Child Psychiatry","Psychopharmacology"],  tip:"DSM criteria and drug treatments. Small, predictable, easy 2%."},
+  {id:"anesthesia",  name:"Anesthesia",       w:2,   d:2, tier:"quick",  color:"#FFC8DD", emoji:"😷", topics:["General Anesthesia","Regional Blocks","Pain Management","ICU","Preoperative Assessment","Airway Mgmt"],          tip:"Drug doses, types of anesthesia, ASA classification. Airway algorithms are high-yield."},
+  {id:"radiology",   name:"Radiology",        w:1.5, d:2, tier:"quick",  color:"#BDE0FE", emoji:"📡", topics:["X-ray","CT Findings","MRI Basics","USG","Contrast Studies","Nuclear Medicine"],                                  tip:"Learn 30-40 named radiological signs — guaranteed marks every year."},
 ];
 
 const TIER_META = {
-  high:   { label:"🔴 High Yield",  bg:"#FED7D7", color:"#C53030" },
-  medium: { label:"🟡 Medium Yield", bg:"#FEFCBF", color:"#975A16" },
-  quick:  { label:"🟢 Quick Win",    bg:"#C6F6D5", color:"#276749" }
+  high:   {label:"🔴 High Yield",  bg:"#FED7D7", color:"#C53030"},
+  medium: {label:"🟡 Medium Yield", bg:"#FEFCBF", color:"#975A16"},
+  quick:  {label:"🟢 Quick Win",    bg:"#C6F6D5", color:"#276749"},
 };
 
 const QUOTES = [
@@ -592,114 +504,94 @@ const QUOTES = [
 ];
 
 const RESOURCES = [
-  {name:"NBE Official Website",url:"https://natboard.edu.in",desc:"Official notifications, hall tickets, results, counselling",emoji:"🏛️",tag:"Official"},
-  {name:"Marrow by Unacademy",url:"https://www.marrow.com",desc:"Video lectures, QBank 20k+ questions, grand tests",emoji:"📺",tag:"Platform"},
-  {name:"PrepLadder",url:"https://www.prepladder.com",desc:"Dr. Bhatia lectures, notes, topic-wise tests",emoji:"📚",tag:"Platform"},
-  {name:"DAMS eLearning",url:"https://www.damsdelhi.com",desc:"Comprehensive coaching & test series",emoji:"🏫",tag:"Coaching"},
-  {name:"Doctors Gang PYQs",url:"https://www.doctorsgang.com",desc:"Previous 10 years papers with explanations",emoji:"📝",tag:"PYQs"},
-  {name:"MedicalStudyZone",url:"https://medicalstudyzone.com",desc:"Free study materials & textbook summaries",emoji:"📖",tag:"Free"},
-  {name:"NEET PG Community",url:"https://t.me/neetpg",desc:"Telegram — discussion, doubts, updates",emoji:"💬",tag:"Community"},
-  {name:"RadioGyan",url:"https://www.radiogyan.com",desc:"Free radiology cases & image atlas",emoji:"📡",tag:"Free"},
-  {name:"Lecturio",url:"https://www.lecturio.com",desc:"International lectures, spaced repetition, QBank",emoji:"🎓",tag:"Platform"},
+  {name:"NBE Official Website",  url:"https://natboard.edu.in",        desc:"Official notifications, hall tickets, results, counselling",   emoji:"🏛️", tag:"Official"},
+  {name:"Marrow by Unacademy",   url:"https://www.marrow.com",          desc:"Video lectures, QBank 20k+ questions, grand tests",             emoji:"📺", tag:"Platform"},
+  {name:"PrepLadder",            url:"https://www.prepladder.com",      desc:"Dr. Bhatia lectures, notes, topic-wise tests",                  emoji:"📚", tag:"Platform"},
+  {name:"DAMS eLearning",        url:"https://www.damsdelhi.com",       desc:"Comprehensive coaching & test series",                          emoji:"🏫", tag:"Coaching"},
+  {name:"Doctors Gang PYQs",     url:"https://www.doctorsgang.com",     desc:"Previous 10 years papers with explanations",                    emoji:"📝", tag:"PYQs"},
+  {name:"MedicalStudyZone",      url:"https://medicalstudyzone.com",    desc:"Free study materials & textbook summaries",                     emoji:"📖", tag:"Free"},
+  {name:"NEET PG Community",     url:"https://t.me/neetpg",             desc:"Telegram — discussion, doubts, updates",                        emoji:"💬", tag:"Community"},
+  {name:"RadioGyan",             url:"https://www.radiogyan.com",       desc:"Free radiology cases & image atlas",                            emoji:"📡", tag:"Free"},
+  {name:"Lecturio",              url:"https://www.lecturio.com",        desc:"International lectures, spaced repetition, QBank",              emoji:"🎓", tag:"Platform"},
 ];
 
 const FALLBACK_NEWS = [
-  {title:"NEET PG 2026 Expected in August",summary:"Based on recent patterns, NEET PG 2026 is expected around August 11, 2026. Keep checking natboard.edu.in for official confirmation."},
-  {title:"NBE Registration Portal",summary:"Registration typically opens 2-3 months before the exam. Keep your documents ready — MBBS degree, internship completion, FMGE certificate."},
-  {title:"NEET PG Pattern Unchanged",summary:"200 MCQs in 3.5 hours, computer-based. No negative marking confirmed for recent sessions — verify for 2026."},
-  {title:"Counselling Updates",summary:"MCC handles All India Quota counselling. State quotas handled by respective state authorities. Check mcc.nic.in for updates."},
-  {title:"Preparation Tip",summary:"Start grand tests 3-4 months before the exam. Focus on high-yield subjects: Medicine, Pharmacology, Pathology make up ~23% of the paper."},
+  {title:"NEET PG 2026 Expected in August",    summary:"Based on recent patterns, NEET PG 2026 is expected around August 11, 2026. Keep checking natboard.edu.in for official confirmation."},
+  {title:"NBE Registration Portal",            summary:"Registration typically opens 2-3 months before the exam. Keep your documents ready — MBBS degree, internship completion, FMGE certificate."},
+  {title:"NEET PG Pattern Unchanged",          summary:"200 MCQs in 3.5 hours, computer-based. No negative marking confirmed for recent sessions — verify for 2026."},
+  {title:"Counselling Updates",                summary:"MCC handles All India Quota counselling. State quotas handled by respective state authorities. Check mcc.nic.in for updates."},
+  {title:"Preparation Tip",                    summary:"Start grand tests 3-4 months before the exam. Focus on high-yield subjects: Medicine, Pharmacology, Pathology make up ~23% of the paper."},
 ];
-
-const SYS_PROMPT = `You are Sufia's personal NEET PG study strategist. Warm, encouraging, deeply practical.
-
-SUFIA: MBBS from Ukraine, cracked FMGE first attempt, completed internship in India. Targeting NEET PG August 2026.
-
-NEET PG: 200 MCQs, 3.5 hours, computer-based.
-Weightage: Medicine 8%, Pharma 7.5%, Patho 7.5%, Surgery 6%, OBG 6%, PSM 6%, Micro 5%, Peds 4%, Anatomy 3.5%, Physio 3.5%, Biochem 3.5%, Ophthal 3.5%, ENT 3.5%, Ortho 3%, Derm 2.5%, FMT 2.5%, Psych 2%, Anes 2%, Radio 1.5%.
-High-yield: Med+Pharma+Patho+Surg+OBG+PSM = 41%. Short subjects (Derm,FMT,Psych,Anes,Radio) = 10.5%, very scoring. ~30-40% concepts repeat from PYQs.
-
-RULES: Under 200 words unless detailed plan requested. Bullet points for plans. Be SPECIFIC with topics. Warm but practical. For subject queries give TOP 5 topics. Reference FMGE success when she doubts. Realistic schedules. Suggest Marrow/PrepLadder/PYQ banks. Use mnemonics. End with one actionable step for TODAY.`;
-
-const GEMINI_API_KEY = "AIzaSyCtdYEjoXV6yW_ob_VHOn8yR3QhP94Wzwc";
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
 
 // ═══════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════
 let subjectStatus = {};
-let chatMsgs = [];
-let bookmarks = [];
-let streak = { current: 0, longest: 0, lastDate: null };
-let currentTab = "home";
+let streak        = {current:0, longest:0, lastDate:null};
 let plannerFilter = "all";
-let copyFeedback = null;
-let copyFeedbackTimer = null;
-let pendingChatMsg = null;
-let chatBusy = false;
+let currentOpenSubjectId = null;
+let newsOrder     = [...FALLBACK_NEWS];
 
-// Wheel state
+// Wheel
 let currentWheelAngle = 0;
-let isSpinning = false;
-let spinFrameId = null;
+let isSpinning        = false;
+let spinFrameId       = null;
 
 // ═══════════════════════════════════════════════════════
 // STORAGE
 // ═══════════════════════════════════════════════════════
 function loadData(key) {
-  try {
-    const raw = localStorage.getItem(key);
-    return raw ? JSON.parse(raw) : null;
-  } catch { return null; }
+  try { const r = localStorage.getItem(key); return r ? JSON.parse(r) : null; }
+  catch { return null; }
+}
+function saveData(key, val) {
+  try { localStorage.setItem(key, JSON.stringify(val)); return true; }
+  catch { return false; }
 }
 
-function saveData(key, value) {
-  try {
-    localStorage.setItem(key, JSON.stringify(value));
-    return true;
-  } catch { return false; }
+// ═══════════════════════════════════════════════════════
+// NAVIGATION — the core fix
+// ═══════════════════════════════════════════════════════
+function switchTab(tabId) {
+  // Hide every section
+  document.querySelectorAll('.tab-section').forEach(el => { el.style.display = 'none'; });
+
+  // Show only the requested section
+  const section = document.getElementById('tab-' + tabId);
+  if (section) section.style.display = 'block';
+
+  // Update nav button active states
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.tab === tabId);
+  });
+
+  window.scrollTo(0, 0);
 }
 
 // ═══════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════
 function init() {
-  // Load data
-  const chatD = loadData(KEYS.chat);
-  const bkD = loadData(KEYS.bookmarks);
+  // Load persisted data
   const subjD = loadData(KEYS.subjects);
-  const strD = loadData(KEYS.streak);
-
-  if (chatD && Array.isArray(chatD)) chatMsgs = chatD;
-  if (bkD && Array.isArray(bkD)) bookmarks = bkD;
+  const strD  = loadData(KEYS.streak);
   if (subjD) subjectStatus = subjD;
 
-  // Streak
-  const today = new Date().toDateString();
+  // Streak logic
+  const today     = new Date().toDateString();
   const yesterday = new Date(Date.now() - 864e5).toDateString();
-  let s = strD || { current: 0, longest: 0, lastDate: null };
-  if (s.lastDate === today) { /* already counted */ }
-  else if (s.lastDate === yesterday) { s = { ...s, current: (s.current || 0) + 1, lastDate: today }; }
-  else { s = { ...s, current: 1, lastDate: today }; }
-  if (s.current > (s.longest || 0)) s.longest = s.current;
+  let s = strD || {current:0, longest:0, lastDate:null};
+  if (s.lastDate === today) { /* no change — same day */ }
+  else if (s.lastDate === yesterday) { s = {...s, current:(s.current||0)+1, lastDate:today}; }
+  else { s = {...s, current:1, lastDate:today}; }
+  if (s.current > (s.longest||0)) s.longest = s.current;
   streak = s;
   saveData(KEYS.streak, s);
 
-  // Start countdown
-  updateCountdown();
-  setInterval(updateCountdown, 1000);
-
-  // Daily quote
-  const doy = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 864e5);
-  const q = QUOTES[doy % QUOTES.length];
-  document.getElementById('daily-quote-text').textContent = `"${q.t}"`;
-  document.getElementById('daily-quote-cat').textContent = q.c;
-  document.getElementById('daily-quote-card').style.display = 'block';
-
   // Greeting
   const hour = new Date().getHours();
-  const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
-  document.getElementById('greeting-text').textContent = greeting + ",";
+  document.getElementById('greeting-text').textContent =
+    (hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening") + ",";
 
   // Streak badge
   if (streak.current > 0) {
@@ -707,26 +599,34 @@ function init() {
     document.getElementById('streak-num').textContent = streak.current;
   }
 
-  // News
-  renderHomeNews();
+  // Daily quote (deterministic by day-of-year)
+  const doy = Math.floor((new Date() - new Date(new Date().getFullYear(),0,0)) / 864e5);
+  const q   = QUOTES[doy % QUOTES.length];
+  document.getElementById('daily-quote-text').textContent = `"${q.t}"`;
+  document.getElementById('daily-quote-cat').textContent  = q.c;
+  document.getElementById('daily-quote-card').style.display = 'block';
+
+  // Countdown
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
 
   // Render static content
+  renderHomeNews();
   renderResources();
   renderPrepTips();
+  renderSubjectsList();
   renderWeightageChart();
   buildWheel();
 
-  // Update all progress-dependent UI
+  // Update all progress UI
   updateProgressUI();
-  updateSubjectsList();
-  updateChatUI();
-  updateBookmarksUI();
 
-  // Hide loading, show app
+  // Show app, hide loading
   document.getElementById('loading').style.display = 'none';
-  document.getElementById('app').style.display = 'block';
+  document.getElementById('app').style.display     = 'block';
   document.getElementById('bottom-nav').style.display = 'flex';
 
+  // Start on Home tab
   switchTab('home');
 }
 
@@ -735,103 +635,56 @@ function init() {
 // ═══════════════════════════════════════════════════════
 function updateCountdown() {
   const diff = EXAM_DATE - new Date();
-  if (diff > 0) {
-    document.getElementById('cd-days').textContent = String(Math.floor(diff / 864e5)).padStart(2, '0');
-    document.getElementById('cd-hours').textContent = String(Math.floor((diff / 36e5) % 24)).padStart(2, '0');
-    document.getElementById('cd-mins').textContent = String(Math.floor((diff / 6e4) % 60)).padStart(2, '0');
-    document.getElementById('cd-secs').textContent = String(Math.floor((diff / 1e3) % 60)).padStart(2, '0');
-  }
-}
-
-// ═══════════════════════════════════════════════════════
-// TAB NAVIGATION
-// ═══════════════════════════════════════════════════════
-function switchTab(tabName) {
-  currentTab = tabName;
-
-  // Hide all tabs
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-
-  // Show selected tab
-  const tabEl = document.getElementById('tab-' + tabName);
-  if (tabEl) tabEl.classList.add('active');
-
-  // Update nav
-  document.querySelectorAll('.nav-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.tab === tabName);
-  });
-
-  // Close bookmarks panel when switching away from study
-  if (tabName !== 'study') {
-    document.getElementById('bookmarks-panel').style.display = 'none';
-    const bkBtn = document.getElementById('bk-toggle-btn');
-    bkBtn.style.background = '#fff';
-    bkBtn.style.color = 'var(--text)';
-    bkBtn.style.borderColor = '#e8ddd4';
-  }
-
-  // Handle pending chat
-  if (tabName === 'study' && pendingChatMsg) {
-    const msg = pendingChatMsg;
-    pendingChatMsg = null;
-    setTimeout(() => sendChat(msg), 200);
-  }
-
-  // Scroll to top
-  window.scrollTo(0, 0);
+  if (diff <= 0) return;
+  document.getElementById('cd-days').textContent  = String(Math.floor(diff / 864e5)).padStart(2,'0');
+  document.getElementById('cd-hours').textContent = String(Math.floor((diff/36e5)%24)).padStart(2,'0');
+  document.getElementById('cd-mins').textContent  = String(Math.floor((diff/6e4)%60)).padStart(2,'0');
+  document.getElementById('cd-secs').textContent  = String(Math.floor((diff/1e3)%60)).padStart(2,'0');
 }
 
 // ═══════════════════════════════════════════════════════
 // PROGRESS UI
 // ═══════════════════════════════════════════════════════
 function updateProgressUI() {
-  const doneCount = Object.values(subjectStatus).filter(v => v === "done").length;
-  const ipCount = Object.values(subjectStatus).filter(v => v === "in_progress").length;
-  const nsCount = 19 - doneCount - ipCount;
+  const done = Object.values(subjectStatus).filter(v => v === "done").length;
+  const ip   = Object.values(subjectStatus).filter(v => v === "in_progress").length;
+  const ns   = 19 - done - ip;
 
-  // Home tab
-  document.getElementById('progress-label').textContent = `${doneCount}/19`;
-  document.getElementById('progress-done-bar').style.width = `${(doneCount / 19) * 100}%`;
-  document.getElementById('progress-ip-bar').style.width = `${(ipCount / 19) * 100}%`;
-  document.getElementById('prog-done').textContent = `✅ ${doneCount}`;
-  document.getElementById('prog-ip').textContent = `🟡 ${ipCount}`;
-  document.getElementById('prog-ns').textContent = `⬜ ${nsCount}`;
+  // Home
+  document.getElementById('home-progress-label').textContent = `${done}/19`;
+  document.getElementById('home-done-bar').style.width = `${(done/19)*100}%`;
+  document.getElementById('home-ip-bar').style.width   = `${(ip/19)*100}%`;
+  document.getElementById('home-done-ct').textContent  = `✅ ${done}`;
+  document.getElementById('home-ip-ct').textContent    = `🟡 ${ip}`;
+  document.getElementById('home-ns-ct').textContent    = `⬜ ${ns}`;
+  document.getElementById('qa-planner-desc').textContent = `${done}/19 done`;
 
-  // Quick access
-  document.getElementById('qa-planner-desc').textContent = `${doneCount}/19 done`;
-
-  // Planner tab
-  document.getElementById('planner-progress-label').textContent = `${doneCount}/19`;
-  document.getElementById('planner-done-bar').style.width = `${(doneCount / 19) * 100}%`;
-  document.getElementById('planner-ip-bar').style.width = `${(ipCount / 19) * 100}%`;
-  document.getElementById('planner-done-ct').textContent = `✅ ${doneCount}`;
-  document.getElementById('planner-ip-ct').textContent = `🟡 ${ipCount}`;
-  document.getElementById('planner-ns-ct').textContent = `⬜ ${nsCount}`;
+  // Planner
+  document.getElementById('planner-progress-label').textContent = `${done}/19`;
+  document.getElementById('planner-done-bar').style.width = `${(done/19)*100}%`;
+  document.getElementById('planner-ip-bar').style.width   = `${(ip/19)*100}%`;
+  document.getElementById('planner-done-ct').textContent  = `✅ ${done}`;
+  document.getElementById('planner-ip-ct').textContent    = `🟡 ${ip}`;
+  document.getElementById('planner-ns-ct').textContent    = `⬜ ${ns}`;
 }
 
 // ═══════════════════════════════════════════════════════
 // NEWS
 // ═══════════════════════════════════════════════════════
-let newsOrder = [...FALLBACK_NEWS];
-
 function renderHomeNews() {
-  const el = document.getElementById('home-news');
-  el.innerHTML = newsOrder.slice(0, 3).map(n => `
+  document.getElementById('home-news').innerHTML = newsOrder.slice(0,3).map(n => `
     <div style="padding:7px 10px;background:var(--bg);border-radius:8px;margin-bottom:5px;font-size:12px">
-      <span style="font-weight:700">${escHtml(n.title)}</span>
-      ${n.summary ? `<p style="font-size:11px;color:var(--text-l);margin-top:2px;line-height:1.4">${escHtml(n.summary)}</p>` : ''}
-    </div>
-  `).join('');
+      <span style="font-weight:700">${esc(n.title)}</span>
+      <p style="font-size:11px;color:var(--text-l);margin-top:2px;line-height:1.4">${esc(n.summary)}</p>
+    </div>`).join('');
 }
 
 function renderResourcesNews() {
-  const el = document.getElementById('resources-news');
-  el.innerHTML = newsOrder.map(n => `
+  document.getElementById('resources-news').innerHTML = newsOrder.map(n => `
     <div style="padding:8px 10px;background:var(--bg);border-radius:8px;margin-bottom:6px">
-      <p style="font-size:12px;font-weight:700">📌 ${escHtml(n.title)}</p>
-      ${n.summary ? `<p style="font-size:11px;color:var(--text-l);margin-top:2px;line-height:1.4">${escHtml(n.summary)}</p>` : ''}
-    </div>
-  `).join('');
+      <p style="font-size:12px;font-weight:700">📌 ${esc(n.title)}</p>
+      <p style="font-size:11px;color:var(--text-l);margin-top:2px;line-height:1.4">${esc(n.summary)}</p>
+    </div>`).join('');
 }
 
 function shuffleNews() {
@@ -845,21 +698,20 @@ function shuffleNews() {
 // ═══════════════════════════════════════════════════════
 function renderResources() {
   document.getElementById('resources-list').innerHTML = RESOURCES.map(r => `
-    <a href="${r.url}" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit;display:block;margin-bottom:8px">
+    <a href="${r.url}" target="_blank" rel="noopener noreferrer"
+       style="text-decoration:none;color:inherit;display:block;margin-bottom:8px">
       <div class="card card-hover" style="padding:12px 14px;display:flex;align-items:center;gap:10px">
         <div style="font-size:26px;width:38px;text-align:center">${r.emoji}</div>
         <div style="flex:1">
           <div style="display:flex;align-items:center;gap:6px">
-            <span style="font-weight:700;font-size:13px">${escHtml(r.name)}</span>
-            <span style="font-size:9px;padding:1px 6px;border-radius:5px;background:var(--pri-soft);color:var(--pri-dark);font-weight:700">${escHtml(r.tag)}</span>
+            <span style="font-weight:700;font-size:13px">${esc(r.name)}</span>
+            <span style="font-size:9px;padding:1px 6px;border-radius:5px;background:var(--pri-soft);color:var(--pri-dark);font-weight:700">${esc(r.tag)}</span>
           </div>
-          <p style="font-size:11px;color:var(--text-l);margin-top:2px">${escHtml(r.desc)}</p>
+          <p style="font-size:11px;color:var(--text-l);margin-top:2px">${esc(r.desc)}</p>
         </div>
         <span style="color:var(--pri);font-size:14px">↗</span>
       </div>
-    </a>
-  `).join('');
-
+    </a>`).join('');
   renderResourcesNews();
 }
 
@@ -873,39 +725,38 @@ function renderPrepTips() {
     "Find a study partner for accountability.",
     "Start grand tests 3+ months before the exam.",
   ];
-  document.getElementById('prep-tips').innerHTML = tips.map(tip => `
+  document.getElementById('prep-tips').innerHTML = tips.map(t => `
     <div style="display:flex;gap:6px;margin-bottom:7px;align-items:flex-start">
-      <span style="color:var(--mint);font-weight:800;font-size:12px">✓</span>
-      <p style="font-size:12px;line-height:1.5">${escHtml(tip)}</p>
-    </div>
-  `).join('');
+      <span style="color:var(--mint);font-weight:800;font-size:12px;flex-shrink:0">✓</span>
+      <p style="font-size:12px;line-height:1.5">${esc(t)}</p>
+    </div>`).join('');
 }
 
 // ═══════════════════════════════════════════════════════
 // PLANNER
 // ═══════════════════════════════════════════════════════
-const STATUS_ICON = { undefined: "⬜", in_progress: "🟡", done: "✅" };
-const STATUS_LABEL = { undefined: "Not Started", in_progress: "In Progress", done: "Completed" };
+const SI = {undefined:"⬜", in_progress:"🟡", done:"✅"};
+const SL = {undefined:"Not Started", in_progress:"In Progress", done:"Completed"};
 
 function setFilter(btn, filter) {
   plannerFilter = filter;
-  document.querySelectorAll('#filter-pills .pill').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.filter-row .pill').forEach(p => p.classList.remove('active'));
   btn.classList.add('active');
-  updateSubjectsList();
+  renderSubjectsList();
 }
 
-function updateSubjectsList() {
-  const filtered = plannerFilter === 'all' ? SUBJECTS : SUBJECTS.filter(s => s.tier === plannerFilter);
-  const el = document.getElementById('subjects-list');
-  el.innerHTML = filtered.map(s => {
-    const status = subjectStatus[s.id];
-    const tm = TIER_META[s.tier];
+function renderSubjectsList() {
+  const list = plannerFilter === 'all' ? SUBJECTS : SUBJECTS.filter(s => s.tier === plannerFilter);
+  document.getElementById('subjects-list').innerHTML = list.map(s => {
+    const tm  = TIER_META[s.tier];
+    const st  = subjectStatus[s.id];
     return `
-      <div class="card card-hover subject-card" onclick="openModal('${s.id}')" style="border-left:4px solid ${s.color}">
+      <div class="card card-hover subject-card" onclick="openModal('${s.id}')"
+           style="border-left:4px solid ${s.color}">
         <div style="font-size:26px;width:38px;text-align:center">${s.emoji}</div>
         <div style="flex:1;min-width:0">
           <div style="display:flex;justify-content:space-between;align-items:center">
-            <span style="font-weight:700;font-size:13px">${escHtml(s.name)}</span>
+            <span style="font-weight:700;font-size:13px">${esc(s.name)}</span>
             <span style="font-size:12px;font-weight:800;color:var(--pri-dark)">${s.w}%</span>
           </div>
           <div style="display:flex;align-items:center;gap:6px;margin-top:3px">
@@ -913,31 +764,25 @@ function updateSubjectsList() {
             <span style="font-size:10px;color:var(--text-m)">${'⭐'.repeat(s.d)}</span>
           </div>
         </div>
-        <div onclick="event.stopPropagation();cycleStatus('${s.id}')" style="font-size:20px;padding:4px;cursor:pointer">${STATUS_ICON[status]}</div>
-      </div>
-    `;
+        <div onclick="event.stopPropagation();cycleStatus('${s.id}')"
+             style="font-size:22px;padding:6px;cursor:pointer;min-width:44px;text-align:center;min-height:44px;display:flex;align-items:center;justify-content:center">
+          ${SI[st]}
+        </div>
+      </div>`;
   }).join('');
 }
 
 function cycleStatus(id) {
   const order = [undefined, "in_progress", "done"];
-  const cur = subjectStatus[id];
-  const next = order[(order.indexOf(cur) + 1) % 3];
-  const updated = { ...subjectStatus };
-  if (next === undefined) delete updated[id];
-  else updated[id] = next;
-  subjectStatus = updated;
-  saveData(KEYS.subjects, updated);
+  const cur   = subjectStatus[id];
+  const next  = order[(order.indexOf(cur) + 1) % 3];
+  if (next === undefined) delete subjectStatus[id];
+  else subjectStatus[id] = next;
+  saveData(KEYS.subjects, subjectStatus);
   updateProgressUI();
-  updateSubjectsList();
-  // Refresh modal if open
-  if (document.getElementById('subject-modal').style.display !== 'none') {
-    const cur = currentOpenSubjectId;
-    if (cur) renderModalBody(cur);
-  }
+  renderSubjectsList();
+  if (currentOpenSubjectId === id) renderModalBody(id);
 }
-
-let currentOpenSubjectId = null;
 
 function openModal(id) {
   currentOpenSubjectId = id;
@@ -947,18 +792,19 @@ function openModal(id) {
 }
 
 function renderModalBody(id) {
-  const s = SUBJECTS.find(x => x.id === id);
+  const s  = SUBJECTS.find(x => x.id === id);
   if (!s) return;
   const tm = TIER_META[s.tier];
-  const status = subjectStatus[s.id];
+  const st = subjectStatus[s.id];
   document.getElementById('modal-body').innerHTML = `
     <div style="font-size:34px;margin-bottom:6px">${s.emoji}</div>
-    <h3 style="font-family:'Playfair Display',serif;font-size:20px;margin-bottom:6px">${escHtml(s.name)}</h3>
+    <h3 style="font-family:'Playfair Display',serif;font-size:20px;margin-bottom:6px">${esc(s.name)}</h3>
     <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;background:${tm.bg};color:${tm.color}">${tm.label}</span>
-    <div onclick="cycleStatus('${s.id}')" style="margin:12px 0;padding:10px 14px;background:var(--bg);border-radius:12px;cursor:pointer;display:flex;align-items:center;gap:8px">
-      <span style="font-size:22px">${STATUS_ICON[status]}</span>
+    <div onclick="cycleStatus('${s.id}')"
+         style="margin:12px 0;padding:10px 14px;background:var(--bg);border-radius:12px;cursor:pointer;display:flex;align-items:center;gap:8px">
+      <span style="font-size:22px">${SI[st]}</span>
       <div>
-        <div style="font-size:13px;font-weight:700">${STATUS_LABEL[status]}</div>
+        <div style="font-size:13px;font-weight:700">${SL[st]}</div>
         <div style="font-size:10px;color:var(--text-m)">Tap to change</div>
       </div>
     </div>
@@ -968,19 +814,19 @@ function renderModalBody(id) {
         <div style="font-size:10px;color:var(--text-m)">of NEET PG</div>
       </div>
       <div style="background:var(--bg);border-radius:10px;padding:10px;text-align:center">
-        <div style="font-size:14px">${'⭐'.repeat(s.d)}${'☆'.repeat(5 - s.d)}</div>
+        <div style="font-size:14px">${'⭐'.repeat(s.d)}${'☆'.repeat(5-s.d)}</div>
         <div style="font-size:10px;color:var(--text-m)">Difficulty</div>
       </div>
     </div>
     <p style="font-size:11px;font-weight:700;color:var(--text-l);margin-bottom:6px">🎯 HIGH-YIELD TOPICS</p>
     <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px">
-      ${s.topics.map(t => `<span class="topic-tag" style="background:${s.color}55">${escHtml(t)}</span>`).join('')}
+      ${s.topics.map(t => `<span style="padding:3px 9px;border-radius:7px;font-size:11px;font-weight:600;background:${s.color}55;display:inline-block;margin:2px">${esc(t)}</span>`).join('')}
     </div>
     <div style="background:var(--bg);border-radius:10px;padding:10px;border-left:3px solid var(--accent);margin-bottom:14px">
       <p style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:3px">💡 STRATEGY</p>
-      <p style="font-size:12px;line-height:1.5">${escHtml(s.tip)}</p>
+      <p style="font-size:12px;line-height:1.5">${esc(s.tip)}</p>
     </div>
-    <button class="btn-primary" onclick="askAIForSubject('${s.id}')" style="width:100%">🤖 Ask AI for Strategy →</button>
+    <p style="font-size:12px;color:var(--pri-dark);font-weight:700;text-align:center;padding:8px">You've got this! 💪</p>
   `;
 }
 
@@ -990,251 +836,16 @@ function closeModal() {
   currentOpenSubjectId = null;
 }
 
-function askAIForSubject(id) {
-  const s = SUBJECTS.find(x => x.id === id);
-  if (!s) return;
-  closeModal();
-  pendingChatMsg = `Give me a detailed NEET PG study plan for ${s.name} — top 5 topics, time allocation, best approach`;
-  switchTab('study');
-}
-
 function renderWeightageChart() {
-  const top8 = [...SUBJECTS].sort((a, b) => b.w - a.w).slice(0, 8);
+  const top8 = [...SUBJECTS].sort((a,b) => b.w - a.w).slice(0,8);
   document.getElementById('weightage-chart').innerHTML = top8.map(s => `
     <div style="display:flex;align-items:center;gap:6px;margin-bottom:7px">
-      <span style="font-size:11px;width:55px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${s.emoji}${s.name.split(' ')[0].slice(0, 6)}</span>
+      <span style="font-size:11px;width:55px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${s.emoji}${s.name.split(' ')[0].slice(0,6)}</span>
       <div style="flex:1;height:8px;background:#f5f0eb;border-radius:4px;overflow:hidden">
-        <div style="width:${(s.w / 8) * 100}%;height:100%;background:linear-gradient(90deg,${s.color},var(--pri));border-radius:4px"></div>
+        <div style="width:${(s.w/8)*100}%;height:100%;background:linear-gradient(90deg,${s.color},var(--pri));border-radius:4px"></div>
       </div>
       <span style="font-size:10px;font-weight:700;color:var(--text-l);width:28px;text-align:right">${s.w}%</span>
-    </div>
-  `).join('');
-}
-
-// ═══════════════════════════════════════════════════════
-// CHAT
-// ═══════════════════════════════════════════════════════
-function updateChatUI() {
-  const msgEl = document.getElementById('chat-messages');
-  const promptsEl = document.getElementById('quick-prompts');
-  const clearBtn = document.getElementById('clear-chat-btn');
-  const bkToggle = document.getElementById('bk-toggle-btn');
-
-  // Show/hide quick prompts
-  const bkPanelVisible = document.getElementById('bookmarks-panel').style.display !== 'none';
-  promptsEl.style.display = (chatMsgs.length === 0 && !bkPanelVisible) ? 'block' : 'none';
-
-  // Clear btn
-  clearBtn.style.display = chatMsgs.length > 0 ? 'block' : 'none';
-
-  // Bookmark count
-  document.getElementById('bk-count').textContent = bookmarks.length;
-
-  // Quick access desc
-  document.getElementById('qa-study-desc').textContent = chatMsgs.length > 0 ? `${chatMsgs.length} msgs` : 'Ask anything';
-
-  // Render messages
-  msgEl.innerHTML = chatMsgs.map((msg, i) => {
-    if (msg.role === 'user') {
-      return `<div style="display:flex;justify-content:flex-end"><div class="msg-bubble msg-user">${escHtml(msg.text)}</div></div>`;
-    } else {
-      const isBk = bookmarks.some(b => b.text === msg.text);
-      return `
-        <div style="display:flex;justify-content:flex-start">
-          <div class="msg-bubble msg-ai" id="msg-${i}">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-              <span style="font-size:10px;font-weight:700;color:var(--pri)">🤖 Study AI</span>
-              <div style="display:flex;gap:4px">
-                <button onclick="copyText(${JSON.stringify(msg.text)}, this)" style="background:none;border:none;cursor:pointer;font-size:14px;padding:0">📋</button>
-                <button onclick="toggleBookmark(${i})" style="background:none;border:none;cursor:pointer;font-size:14px;padding:0">${isBk ? '⭐' : '☆'}</button>
-              </div>
-            </div>
-            ${escHtmlPre(msg.text)}
-          </div>
-        </div>
-      `;
-    }
-  }).join('');
-
-  // Scroll to bottom
-  msgEl.scrollTop = msgEl.scrollHeight;
-}
-
-async function sendChat(overrideMsg) {
-  const input = document.getElementById('chat-input');
-  const msg = overrideMsg || input.value.trim();
-  if (!msg || chatBusy) return;
-  input.value = '';
-  chatBusy = true;
-
-  const newMsgs = [...chatMsgs, { role: "user", text: msg, ts: Date.now() }];
-  chatMsgs = newMsgs;
-  updateChatUI();
-  showTyping();
-
-  const sendBtn = document.getElementById('send-btn');
-  sendBtn.disabled = true;
-
-  try {
-    const recentHistory = newMsgs.slice(-20);
-    const contents = recentHistory.map(m => ({
-      role: m.role === "user" ? "user" : "model",
-      parts: [{ text: m.text }]
-    }));
-
-    const response = await fetch(GEMINI_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: SYS_PROMPT }] },
-        contents: contents,
-        generationConfig: { maxOutputTokens: 1000, temperature: 0.7 }
-      })
-    });
-
-    const data = await response.json();
-    let reply;
-
-    if (response.status === 429) {
-      reply = "Taking a short break — I'll be back in a minute! In the meantime, check out the Subject Planner for study tips. 📋";
-    } else if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-      reply = data.candidates[0].content.parts.map(p => p.text).join("\n");
-    } else {
-      reply = "Couldn't connect right now — but you've got this! Try again in a moment. 💪";
-    }
-
-    chatMsgs = [...newMsgs, { role: "assistant", text: reply, ts: Date.now() }];
-    saveData(KEYS.chat, chatMsgs.slice(-50));
-  } catch {
-    chatMsgs = [...newMsgs, { role: "assistant", text: "Couldn't connect right now — but you've got this! Try again in a moment. 💪", ts: Date.now() }];
-  }
-
-  chatBusy = false;
-  sendBtn.disabled = false;
-  hideTyping();
-  updateChatUI();
-}
-
-function showTyping() {
-  const msgEl = document.getElementById('chat-messages');
-  const typing = document.createElement('div');
-  typing.id = 'typing-indicator';
-  typing.style.display = 'flex';
-  typing.innerHTML = `<div class="typing-dots">${[0,1,2].map(i => `<div class="typing-dot" style="animation:pulse 1s ease ${i * .15}s infinite"></div>`).join('')}</div>`;
-  msgEl.appendChild(typing);
-  msgEl.scrollTop = msgEl.scrollHeight;
-}
-
-function hideTyping() {
-  const typing = document.getElementById('typing-indicator');
-  if (typing) typing.remove();
-}
-
-function clearChat() {
-  if (confirm("Clear all chat history?")) {
-    chatMsgs = [];
-    saveData(KEYS.chat, []);
-    updateChatUI();
-  }
-}
-
-// ═══════════════════════════════════════════════════════
-// BOOKMARKS
-// ═══════════════════════════════════════════════════════
-function toggleBookmarksPanel() {
-  const panel = document.getElementById('bookmarks-panel');
-  const btn = document.getElementById('bk-toggle-btn');
-  const isVisible = panel.style.display !== 'none';
-  panel.style.display = isVisible ? 'none' : 'block';
-  btn.style.background = isVisible ? '#fff' : 'var(--pri)';
-  btn.style.color = isVisible ? 'var(--text)' : '#fff';
-  btn.style.borderColor = isVisible ? '#e8ddd4' : 'var(--pri)';
-
-  // Hide quick prompts when bookmarks shown
-  const promptsEl = document.getElementById('quick-prompts');
-  if (!isVisible) {
-    promptsEl.style.display = 'none';
-  } else if (chatMsgs.length === 0) {
-    promptsEl.style.display = 'block';
-  }
-
-  updateBookmarksUI();
-}
-
-function updateBookmarksUI() {
-  document.getElementById('bk-count').textContent = bookmarks.length;
-  document.getElementById('bk-panel-count').textContent = bookmarks.length;
-
-  const list = document.getElementById('bookmarks-list');
-  if (bookmarks.length === 0) {
-    list.innerHTML = `<p style="font-size:12px;color:var(--text-m);padding:8px 0">Tap ⭐ on any AI response to save it!</p>`;
-    return;
-  }
-  list.innerHTML = [...bookmarks].reverse().map((b, i) => {
-    const origIdx = bookmarks.length - 1 - i;
-    const preview = b.text.length > 160 ? b.text.slice(0, 160) + '...' : b.text;
-    return `
-      <div style="padding:8px;background:#fff;border-radius:10px;margin-bottom:6px;font-size:12px;line-height:1.5;position:relative">
-        <div style="padding-right:50px">${escHtml(preview)}</div>
-        <div style="position:absolute;top:6px;right:6px;display:flex;gap:4px">
-          <button onclick="copyText(${JSON.stringify(b.text)}, this)" style="background:none;border:none;cursor:pointer;font-size:14px;padding:2px">📋</button>
-          <button onclick="removeBookmark(${origIdx})" style="background:none;border:none;cursor:pointer;font-size:12px;padding:2px;color:#999">✕</button>
-        </div>
-        <div style="font-size:10px;color:var(--text-m);margin-top:4px">${new Date(b.ts).toLocaleDateString()}</div>
-      </div>
-    `;
-  }).join('');
-}
-
-function toggleBookmark(msgIdx) {
-  const msg = chatMsgs[msgIdx];
-  if (!msg) return;
-  const exists = bookmarks.some(b => b.text === msg.text);
-  if (exists) {
-    bookmarks = bookmarks.filter(b => b.text !== msg.text);
-  } else {
-    bookmarks = [...bookmarks, { text: msg.text, ts: Date.now() }];
-  }
-  saveData(KEYS.bookmarks, bookmarks);
-  updateChatUI();
-  updateBookmarksUI();
-}
-
-function removeBookmark(idx) {
-  bookmarks.splice(idx, 1);
-  saveData(KEYS.bookmarks, bookmarks);
-  updateBookmarksUI();
-  updateChatUI();
-}
-
-// ═══════════════════════════════════════════════════════
-// COPY
-// ═══════════════════════════════════════════════════════
-function copyText(text, btn) {
-  try {
-    navigator.clipboard.writeText(text).then(() => {
-      if (btn) {
-        const orig = btn.textContent;
-        btn.textContent = '✓';
-        setTimeout(() => { btn.textContent = orig; }, 1500);
-      }
-    });
-  } catch {
-    // fallback
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    ta.style.position = 'fixed';
-    ta.style.opacity = '0';
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    ta.remove();
-    if (btn) {
-      const orig = btn.textContent;
-      btn.textContent = '✓';
-      setTimeout(() => { btn.textContent = orig; }, 1500);
-    }
-  }
+    </div>`).join('');
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1245,42 +856,44 @@ const WL = ["💪","🩺","🧠","📝","✨","🌟","🎯","💫"];
 
 function buildWheel() {
   const svg = document.getElementById('wheel-svg');
-  let paths = '';
+  let html = '';
   for (let i = 0; i < 8; i++) {
-    const a = i * 45;
-    const r1 = (a - 90) * Math.PI / 180;
-    const r2 = (a + 45 - 90) * Math.PI / 180;
-    const mr = (a + 22.5 - 90) * Math.PI / 180;
-    const x1 = 130 + 120 * Math.cos(r1), y1 = 130 + 120 * Math.sin(r1);
-    const x2 = 130 + 120 * Math.cos(r2), y2 = 130 + 120 * Math.sin(r2);
-    const tx = 130 + 78 * Math.cos(mr), ty = 130 + 78 * Math.sin(mr);
-    paths += `<path d="M130,130 L${x1},${y1} A120,120 0 0,1 ${x2},${y2} Z" fill="${WC[i]}" stroke="#fff" stroke-width="2.5"/>`;
-    paths += `<text x="${tx}" y="${ty}" text-anchor="middle" dominant-baseline="central" font-size="28">${WL[i]}</text>`;
+    const a   = i * 45;
+    const r1  = (a - 90) * Math.PI / 180;
+    const r2  = (a + 45 - 90) * Math.PI / 180;
+    const mr  = (a + 22.5 - 90) * Math.PI / 180;
+    const x1  = 130 + 120 * Math.cos(r1), y1 = 130 + 120 * Math.sin(r1);
+    const x2  = 130 + 120 * Math.cos(r2), y2 = 130 + 120 * Math.sin(r2);
+    const tx  = 130 + 78 * Math.cos(mr),  ty = 130 + 78 * Math.sin(mr);
+    html += `<path d="M130,130 L${x1},${y1} A120,120 0 0,1 ${x2},${y2} Z" fill="${WC[i]}" stroke="#fff" stroke-width="2.5"/>`;
+    html += `<text x="${tx}" y="${ty}" text-anchor="middle" dominant-baseline="central" font-size="28">${WL[i]}</text>`;
   }
-  paths += `<circle cx="130" cy="130" r="26" fill="#fff" stroke="var(--pri)" stroke-width="3"/>`;
-  paths += `<text x="130" y="134" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--pri-dark)">✨</text>`;
-  svg.innerHTML = paths;
+  html += `<circle cx="130" cy="130" r="26" fill="#fff" stroke="var(--pri)" stroke-width="3"/>`;
+  html += `<text x="130" y="134" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--pri-dark)">✨</text>`;
+  svg.innerHTML = html;
 }
 
 function spinWheel() {
   if (isSpinning) return;
   isSpinning = true;
-  document.getElementById('spin-quote').style.display = 'none';
+
   const spinBtn = document.getElementById('spin-btn');
   spinBtn.disabled = true;
   spinBtn.textContent = '✨ Spinning...';
+  document.getElementById('spin-quote').style.display = 'none';
 
-  const totalRotation = 1800 + Math.random() * 1800;
-  const duration = 3500;
-  const startTime = performance.now();
-  const startAngle = currentWheelAngle;
+  const totalRotation = 1800 + Math.random() * 1800; // 5–10 full rotations
+  const duration      = 3500;
+  const startTime     = performance.now();
+  const startAngle    = currentWheelAngle;
+  const svg           = document.getElementById('wheel-svg');
 
   function animate(now) {
-    const elapsed = now - startTime;
+    const elapsed  = now - startTime;
     const progress = Math.min(elapsed / duration, 1);
-    const eased = 1 - Math.pow(1 - progress, 3);
+    const eased    = 1 - Math.pow(1 - progress, 3); // cubic ease-out
     currentWheelAngle = startAngle + totalRotation * eased;
-    document.getElementById('wheel-svg').style.transform = `rotate(${currentWheelAngle}deg)`;
+    svg.style.transform = `rotate(${currentWheelAngle}deg)`;
 
     if (progress < 1) {
       spinFrameId = requestAnimationFrame(animate);
@@ -1289,65 +902,69 @@ function spinWheel() {
       spinBtn.disabled = false;
       spinBtn.textContent = '🎡 Spin';
       const quote = QUOTES[Math.floor(Math.random() * QUOTES.length)];
-      const qEl = document.getElementById('spin-quote');
+      const qEl   = document.getElementById('spin-quote');
       qEl.innerHTML = `
-        <p style="font-size:10px;font-weight:700;color:var(--pri);margin-bottom:6px">${escHtml(quote.c)}</p>
-        <p style="font-size:15px;line-height:1.7;font-style:italic;color:var(--text)">"${escHtml(quote.t)}"</p>
-        <button onclick="copyText(${JSON.stringify(quote.t)}, this)" style="margin-top:10px;background:none;border:1px solid var(--pri);border-radius:20px;padding:5px 14px;font-size:12px;cursor:pointer;color:var(--pri-dark);font-family:'Nunito',sans-serif;font-weight:700">📋 Copy</button>
-      `;
+        <p style="font-size:10px;font-weight:700;color:var(--pri);margin-bottom:6px">${esc(quote.c)}</p>
+        <p style="font-size:15px;line-height:1.7;font-style:italic;color:var(--text)">"${esc(quote.t)}"</p>
+        <button onclick="copyQuote(${JSON.stringify(quote.t)})"
+          style="margin-top:10px;background:none;border:1px solid var(--pri);border-radius:20px;padding:5px 14px;font-size:12px;cursor:pointer;color:var(--pri-dark);font-family:'Nunito',sans-serif;font-weight:700">
+          📋 Copy
+        </button>`;
       qEl.style.display = 'block';
     }
   }
   spinFrameId = requestAnimationFrame(animate);
 }
 
-// ═══════════════════════════════════════════════════════
-// RESET
-// ═══════════════════════════════════════════════════════
-function resetAllData() {
-  if (confirm("Reset ALL data? Chat, bookmarks, progress, streak — all gone.")) {
-    if (confirm("Really sure?")) {
-      saveData(KEYS.chat, []);
-      saveData(KEYS.bookmarks, []);
-      saveData(KEYS.subjects, {});
-      const newStreak = { current: 1, longest: 1, lastDate: new Date().toDateString() };
-      saveData(KEYS.streak, newStreak);
-      chatMsgs = [];
-      bookmarks = [];
-      subjectStatus = {};
-      streak = newStreak;
-      updateProgressUI();
-      updateSubjectsList();
-      updateChatUI();
-      updateBookmarksUI();
-      document.getElementById('streak-badge').style.display = 'block';
-      document.getElementById('streak-num').textContent = 1;
-      alert("Reset done.");
-    }
+function copyQuote(text) {
+  try {
+    navigator.clipboard.writeText(text);
+  } catch {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
   }
 }
 
 // ═══════════════════════════════════════════════════════
-// UTILS
+// RESET
 // ═══════════════════════════════════════════════════════
-function escHtml(str) {
+function resetAllData() {
+  if (!confirm("Reset ALL data? Progress, streak — all gone.")) return;
+  if (!confirm("Really sure? This cannot be undone.")) return;
+
+  subjectStatus = {};
+  const fresh = {current:1, longest:1, lastDate:new Date().toDateString()};
+  streak = fresh;
+
+  saveData(KEYS.subjects,  {});
+  saveData(KEYS.bookmarks, []);
+  saveData(KEYS.streak,    fresh);
+
+  // Clear any old chat key too
+  localStorage.removeItem("pgbuddy-chat");
+
+  updateProgressUI();
+  renderSubjectsList();
+
+  document.getElementById('streak-badge').style.display = 'block';
+  document.getElementById('streak-num').textContent = 1;
+
+  alert("Reset done. Starting fresh! 💪");
+}
+
+// ═══════════════════════════════════════════════════════
+// UTIL
+// ═══════════════════════════════════════════════════════
+function esc(str) {
   return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-
-function escHtmlPre(str) {
-  // Escape HTML but preserve line breaks
-  return escHtml(str).replace(/\n/g, '<br>');
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
 // ═══════════════════════════════════════════════════════
-// START
+// BOOT
 // ═══════════════════════════════════════════════════════
-// Give fonts a moment to load then init
 if (document.fonts) {
   document.fonts.ready.then(init);
 } else {
