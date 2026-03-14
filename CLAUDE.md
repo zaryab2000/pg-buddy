@@ -4,14 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-PG Buddy is a mobile-first single-page web app that helps a medical student (Sufia) prepare for India's NEET PG exam (August 2026). It features an AI study mentor powered by Google Gemini, a subject planner, motivational tools, and curated resources.
+PG Buddy is a mobile-first single-page web app that helps a medical student prepare for India's NEET PG exam (August 2026). It features an AI study mentor powered by Google Gemini, a subject planner, motivational tools, and curated resources.
 
 ## Architecture
 
 **Single-file app:** The entire application lives in one `index.html` file — all HTML, CSS, and JS inline. No build tools, no frameworks, no npm, no separate files.
 
 - `index.html` — The complete app (output artifact)
-- `sufia-pg-companion_v2.tsx` — Reference React/JSX file (read-only, source of all data constants)
 - `PRD.md` — Full product specification (read-only)
 
 **Tech stack:** Vanilla HTML/CSS/JS, Google Fonts (Playfair Display + Nunito), Gemini 2.0 Flash API via direct `fetch()`, `localStorage` for persistence.
@@ -48,12 +47,11 @@ All prefixed with `pgbuddy-`: `pgbuddy-subjects`, `pgbuddy-chat`, `pgbuddy-bookm
 
 GitHub Pages from `main` branch, root `/`. Live at `https://zaryab2000.github.io/pg-buddy/`.
 
-## Data Constants (from reference file)
+## Data Constants
 
-All data must be copied exactly from `sufia-pg-companion_v2.tsx`:
+All data constants live directly in `index.html`:
 - 19 subjects with weightage, difficulty, topics, tips
 - 50+ motivational quotes
-- 9 resource links
+- 11 resource links
 - 5 fallback news items
-- Complete AI system prompt
 - Theme color system (CSS custom properties)
