@@ -907,18 +907,6 @@ async function fetchAllNews() {
   if (btn) { btn.disabled = false; btn.textContent = 'Refresh 🔄'; }
 }
 
-function shuffleNews() {
-  newsOrder = [...FALLBACK_NEWS].sort(() => Math.random() - 0.5);
-  renderResourcesNews();
-}
-
-function renderResourcesNews() {
-  document.getElementById('resources-news').innerHTML = newsOrder.map(n => `
-    <div style="padding:8px 10px;background:var(--bg);border-radius:8px;margin-bottom:6px">
-      <p style="font-size:12px;font-weight:700">📌 ${esc(n.title)}</p>
-      <p style="font-size:11px;color:var(--text-l);margin-top:2px;line-height:1.4">${esc(n.summary)}</p>
-    </div>`).join('');
-}
 
 // ═══════════════════════════════════════════════════════
 // RESOURCES
@@ -939,7 +927,6 @@ function renderResources() {
         <span style="color:var(--pri);font-size:14px">↗</span>
       </div>
     </a>`).join('');
-  renderResourcesNews();
 }
 
 function renderPrepTips() {
