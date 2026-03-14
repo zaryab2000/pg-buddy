@@ -759,28 +759,40 @@ async function fetchDailyQuote() {
   const textEl   = document.getElementById('daily-quote-text');
   const authorEl = document.getElementById('daily-quote-author');
 
+  function paintQuote(text, author) {
+    skelEl.style.display   = 'none';
+    textEl.textContent     = `"${text}"`;
+    textEl.style.display   = 'block';
+    authorEl.textContent   = author;
+    authorEl.style.display = 'block';
+  }
+
+  // Check cache — one quote per calendar day
   try {
-    // ZenQuotes requires a server-side call due to CORS on direct browser fetch.
-    // We use allorigins.win as a free no-signup CORS proxy.
+    const raw = localStorage.getItem('pgbuddy-daily-quote');
+    if (raw) {
+      const c = JSON.parse(raw);
+      if (c.date === new Date().toDateString()) {
+        paintQuote(c.text, c.author);
+        return; // cache hit — instant, no network
+      }
+    }
+  } catch {}
+
+  // Cache miss or new day — fetch fresh
+  try {
     const res  = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent('https://zenquotes.io/api/random'));
     const data = await res.json();
-    const arr  = JSON.parse(data.contents);
-    const q    = arr[0];
-
-    skelEl.style.display  = 'none';
-    textEl.textContent    = `"${q.q}"`;
-    textEl.style.display  = 'block';
-    authorEl.textContent  = `— ${q.a}`;
-    authorEl.style.display = 'block';
+    const q    = JSON.parse(data.contents)[0];
+    localStorage.setItem('pgbuddy-daily-quote', JSON.stringify({
+      date: new Date().toDateString(), text: q.q, author: `— ${q.a}`
+    }));
+    paintQuote(q.q, `— ${q.a}`);
   } catch {
     // Fallback: deterministic local quote by day-of-year
     const doy = Math.floor((new Date() - new Date(new Date().getFullYear(),0,0)) / 864e5);
     const q   = QUOTES[doy % QUOTES.length];
-    skelEl.style.display  = 'none';
-    textEl.textContent    = `"${q.t}"`;
-    textEl.style.display  = 'block';
-    authorEl.textContent  = q.c;
-    authorEl.style.display = 'block';
+    paintQuote(q.t, q.c);
   }
 }
 
