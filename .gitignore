@@ -1,0 +1,15 @@
+# Environment variables — never commit secrets
+.env
+.env.*
+!.env.example
+
+# Reference/source files — internal use only
+PRD.md
+sufia-pg-companion_v2.tsx
+
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
