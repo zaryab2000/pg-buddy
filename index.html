@@ -322,7 +322,7 @@
       <div class="card card-hover quick-card" style="background:linear-gradient(135deg,#E8F5E9,#E0F2F1)" onclick="switchTab('resources')">
         <div style="font-size:26px;margin-bottom:6px">📚</div>
         <div style="font-weight:700;font-size:13px">Resources</div>
-        <div style="font-size:11px;color:var(--text-l);margin-top:2px">9 links</div>
+        <div style="font-size:11px;color:var(--text-l);margin-top:2px">11 links</div>
       </div>
     </div>
   </div>
@@ -429,7 +429,16 @@
       <div id="news-india"></div>
     </div>
 
-    <p style="font-size:10px;color:var(--text-m);text-align:center;padding-bottom:8px">Articles open in your browser. Sources: Google News, Medscape, Medical Dialogues.</p>
+    <!-- PG Community & Talks -->
+    <div style="margin-bottom:16px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <span style="font-size:14px;font-weight:800;color:#2D6A4F">💬 PG Community & Talks</span>
+        <span style="font-size:9px;background:#D8F3DC;color:#2D6A4F;padding:2px 7px;border-radius:10px;font-weight:700">r/indianmedschool</span>
+      </div>
+      <div id="news-reddit"></div>
+    </div>
+
+    <p style="font-size:10px;color:var(--text-m);text-align:center;padding-bottom:8px">Sources: Google News, Medscape, Medical Dialogues, Reddit.</p>
   </div>
 
   <!-- ═══ RESOURCES ═══ -->
@@ -590,6 +599,8 @@ const RESOURCES = [
   {name:"NEET PG Community",     url:"https://t.me/neetpg",             desc:"Telegram — discussion, doubts, updates",                        emoji:"💬", tag:"Community"},
   {name:"RadioGyan",             url:"https://www.radiogyan.com",       desc:"Free radiology cases & image atlas",                            emoji:"📡", tag:"Free"},
   {name:"Lecturio",              url:"https://www.lecturio.com",        desc:"International lectures, spaced repetition, QBank",              emoji:"🎓", tag:"Platform"},
+  {name:"r/indianmedschool",     url:"https://www.reddit.com/r/indianmedschool", desc:"Indian med students — NEET PG tips, career advice, peer support", emoji:"🟠", tag:"Community"},
+  {name:"r/medicalschool",       url:"https://www.reddit.com/r/medicalschool",   desc:"300k+ global med students — vents, advice, memes, solidarity",    emoji:"🟠", tag:"Community"},
 ];
 
 const FALLBACK_NEWS = [
@@ -850,6 +861,29 @@ async function fetchHomeNews() {
 }
 
 // News tab: fetch all 3 feeds in parallel
+async function fetchRedditPosts() {
+  // Reddit public JSON — no key needed. Use allorigins proxy for CORS.
+  const url = 'https://www.reddit.com/r/indianmedschool/hot.json?limit=5';
+  const res  = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent(url));
+  const data = await res.json();
+  const json = JSON.parse(data.contents);
+  return json.data.children.map(c => c.data);
+}
+
+function renderRedditCards(posts) {
+  const el = document.getElementById('news-reddit');
+  if (!posts || !posts.length) {
+    el.innerHTML = `<p style="font-size:12px;color:var(--text-m);padding:6px 0">No posts available right now. Try refreshing.</p>`;
+    return;
+  }
+  el.innerHTML = posts.map(p => `
+    <a class="news-card" href="https://reddit.com${esc(p.permalink)}" target="_blank" rel="noopener noreferrer">
+      <div class="news-card-source" style="color:#2D6A4F">r/indianmedschool · ${p.score} upvotes · ${p.num_comments} comments</div>
+      <div class="news-card-title">${esc(p.title)}</div>
+      <div class="news-card-date">${relativeTime(new Date(p.created_utc * 1000).toISOString())}</div>
+    </a>`).join('');
+}
+
 async function fetchAllNews() {
   const btn = document.getElementById('news-refresh-btn');
   if (btn) { btn.disabled = true; btn.textContent = 'Loading...'; }
@@ -857,11 +891,13 @@ async function fetchAllNews() {
   document.getElementById('news-neetpg').innerHTML   = skeletons(4);
   document.getElementById('news-clinical').innerHTML = skeletons(4);
   document.getElementById('news-india').innerHTML    = skeletons(4);
+  document.getElementById('news-reddit').innerHTML   = skeletons(4);
 
-  const [neetpgRes, clinicalRes, indiaRes] = await Promise.allSettled([
+  const [neetpgRes, clinicalRes, indiaRes, redditRes] = await Promise.allSettled([
     fetchFeed('neetpg'),
     fetchFeed('clinical'),
     fetchFeed('india'),
+    fetchRedditPosts(),
   ]);
 
   renderNewsCards(
@@ -882,6 +918,7 @@ async function fetchAllNews() {
     'Medical Dialogues',
     '#C06000'
   );
+  renderRedditCards(redditRes.status === 'fulfilled' ? redditRes.value : null);
 
   if (btn) { btn.disabled = false; btn.textContent = 'Refresh 🔄'; }
 }
@@ -1058,7 +1095,7 @@ function renderWeightageChart() {
 // SPIN WHEEL
 // ═══════════════════════════════════════════════════════
 const WC = ["#FFB3BA","#FFDDB5","#FFFFBA","#BAFFC9","#BAE1FF","#E8BAFF","#FFD1DC","#C9FFE5"];
-const WL = ["💪","🩺","🧠","📝","✨","🌟","🎯","💫"];
+const WL = ["💪","🩺","🧠","📝","💰","👃","🎯","🧁"];
 
 function buildWheel() {
   const svg = document.getElementById('wheel-svg');
