@@ -909,7 +909,8 @@ async function fetchAllNews(force = false) {
   const cache = loadNewsCache();
 
   if (force) {
-    // Manual refresh: show skeletons so user sees something is happening
+    // Disable button immediately so tap feedback is instant
+    if (btn) { btn.disabled = true; btn.textContent = '⏳ Loading...'; btn.style.background = 'var(--pri-soft)'; btn.style.color = 'var(--pri-dark)'; }
     document.getElementById('news-neetpg').innerHTML   = skeletons(4);
     document.getElementById('news-clinical').innerHTML = skeletons(4);
     document.getElementById('news-india').innerHTML    = skeletons(4);
@@ -917,13 +918,13 @@ async function fetchAllNews(force = false) {
     // Auto load: paint cache instantly, skip network if still fresh
     paintNewsFromCache(cache);
     if (!isCacheStale(cache)) return;
+    if (btn) { btn.disabled = true; btn.textContent = '⏳ Loading...'; btn.style.background = 'var(--pri-soft)'; btn.style.color = 'var(--pri-dark)'; }
   } else {
+    if (btn) { btn.disabled = true; btn.textContent = '⏳ Loading...'; btn.style.background = 'var(--pri-soft)'; btn.style.color = 'var(--pri-dark)'; }
     document.getElementById('news-neetpg').innerHTML   = skeletons(4);
     document.getElementById('news-clinical').innerHTML = skeletons(4);
     document.getElementById('news-india').innerHTML    = skeletons(4);
   }
-
-  if (btn) { btn.disabled = true; btn.textContent = 'Updating...'; }
 
   const [neetpgRes, clinicalRes, indiaRes] = await Promise.allSettled([
     fetchFeed('neetpg'),
@@ -941,7 +942,7 @@ async function fetchAllNews(force = false) {
   // Fix: wrap in {ts, data} so loadNewsCache/isCacheStale work correctly
   saveNewsCache({ ts: Date.now(), data: fresh });
 
-  if (btn) { btn.disabled = false; btn.textContent = 'Refresh 🔄'; }
+  if (btn) { btn.disabled = false; btn.textContent = 'Refresh 🔄'; btn.style.background = ''; btn.style.color = ''; }
 }
 
 
