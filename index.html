@@ -878,13 +878,18 @@ function loadNewsCache() {
     const raw = localStorage.getItem(NEWS_CACHE_KEY);
     if (!raw) return null;
     const c = JSON.parse(raw);
+    // Discard malformed entries (missing ts or data)
+    if (!c || !c.ts || !c.data) {
+      localStorage.removeItem(NEWS_CACHE_KEY);
+      return null;
+    }
     return c;
   } catch { return null; }
 }
 
-function saveNewsCache(data) {
+function saveNewsCache(obj) {
   try {
-    localStorage.setItem(NEWS_CACHE_KEY, JSON.stringify({ ts: Date.now(), data }));
+    localStorage.setItem(NEWS_CACHE_KEY, JSON.stringify(obj));
   } catch {}
 }
 
@@ -903,17 +908,20 @@ async function fetchAllNews(force = false) {
   const btn   = document.getElementById('news-refresh-btn');
   const cache = loadNewsCache();
 
-  // Paint cached data immediately — zero wait
-  if (cache && cache.data) {
+  if (force) {
+    // Manual refresh: show skeletons so user sees something is happening
+    document.getElementById('news-neetpg').innerHTML   = skeletons(4);
+    document.getElementById('news-clinical').innerHTML = skeletons(4);
+    document.getElementById('news-india').innerHTML    = skeletons(4);
+  } else if (cache && cache.data) {
+    // Auto load: paint cache instantly, skip network if still fresh
     paintNewsFromCache(cache);
+    if (!isCacheStale(cache)) return;
   } else {
     document.getElementById('news-neetpg').innerHTML   = skeletons(4);
     document.getElementById('news-clinical').innerHTML = skeletons(4);
     document.getElementById('news-india').innerHTML    = skeletons(4);
   }
-
-  // Skip network if cache is fresh and not a manual refresh
-  if (!force && !isCacheStale(cache)) return;
 
   if (btn) { btn.disabled = true; btn.textContent = 'Updating...'; }
 
@@ -930,7 +938,8 @@ async function fetchAllNews(force = false) {
   };
 
   paintNewsFromCache({ data: fresh });
-  saveNewsCache(fresh);
+  // Fix: wrap in {ts, data} so loadNewsCache/isCacheStale work correctly
+  saveNewsCache({ ts: Date.now(), data: fresh });
 
   if (btn) { btn.disabled = false; btn.textContent = 'Refresh 🔄'; }
 }
